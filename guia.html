@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía Walton — Real Estate Finance Modeling</title>
+<style>
+  :root {
+    --azul:    #0071CE;
+    --azul-dk: #004F9F;
+    --amarillo:#FFC220;
+    --gris:    #F5F6F8;
+    --gris-md: #E0E3EA;
+    --texto:   #1A1A2E;
+    --verde:   #28A745;
+    --rojo:    #DC3545;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--gris);
+    color: var(--texto);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--azul-dk) 0%, var(--azul) 100%);
+    color: white;
+    padding: 40px 48px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; right: -30px;
+    width: 200px; height: 200px;
+    background: var(--amarillo);
+    opacity: 0.08;
+    border-radius: 50%;
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--amarillo);
+    color: var(--azul-dk);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 15px;
+    opacity: 0.85;
+    max-width: 560px;
+  }
+  .header .link-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 10px 18px;
+    margin-top: 20px;
+    font-size: 13px;
+  }
+  .header .link-box a {
+    color: var(--amarillo);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+  }
+  .header .link-box a:hover { text-decoration: underline; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
+
+  /* ── ALERTA REQUISITO ── */
+  .requisito {
+    background: #FFF8E1;
+    border-left: 4px solid var(--amarillo);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin-bottom: 36px;
+    font-size: 14px;
+  }
+  .requisito strong { color: var(--azul-dk); }
+
+  /* ── STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 24px; }
+
+  .step {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    overflow: hidden;
+    display: flex;
+  }
+  .step-num {
+    background: var(--azul);
+    color: white;
+    font-size: 26px;
+    font-weight: 800;
+    min-width: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step.final .step-num { background: var(--verde); }
+  .step-body { padding: 22px 26px; flex: 1; }
+  .step-body h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--azul-dk);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-body h2 .icon { font-size: 18px; }
+  .step-body p { font-size: 14px; color: #444; margin-bottom: 10px; }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  /* ── CODE BLOCKS ── */
+  .cmd {
+    background: #1A1A2E;
+    color: #A8FF78;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    position: relative;
+    word-break: break-all;
+  }
+  .cmd .label {
+    position: absolute;
+    top: 6px; right: 10px;
+    font-size: 10px;
+    color: #666;
+    font-family: 'Segoe UI', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .cmd.chat {
+    background: #EEF4FF;
+    color: var(--azul-dk);
+    border-left: 3px solid var(--azul);
+  }
+  .cmd.chat .label { color: var(--azul); }
+  .cmd.url {
+    background: #E8F5E9;
+    color: #1B5E20;
+    border-left: 3px solid var(--verde);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    background: var(--gris-md);
+    color: #555;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag.verde { background: #D4EDDA; color: #155724; }
+  .tag.azul  { background: #D0E9FF; color: var(--azul-dk); }
+  .tag.rojo  { background: #F8D7DA; color: var(--rojo); }
+
+  /* ── NOTAS ── */
+  .nota {
+    background: var(--gris);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #555;
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .nota .ico { flex-shrink: 0; font-size: 16px; }
+
+  /* ── DIVIDER ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+    margin: 36px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gris-md);
+  }
+
+  /* ── REFERENCIA RÁPIDA ── */
+  .ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 0;
+  }
+  .ref-card {
+    background: white;
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-top: 3px solid var(--azul);
+  }
+  .ref-card.amarillo { border-top-color: var(--amarillo); }
+  .ref-card.verde    { border-top-color: var(--verde); }
+  .ref-card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 6px; }
+  .ref-card p  { font-size: 13px; font-weight: 600; color: var(--texto); word-break: break-all; }
+  .ref-card a  { color: var(--azul); text-decoration: none; }
+  .ref-card a:hover { text-decoration: underline; }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 12px;
+    color: #aaa;
+    border-top: 1px solid var(--gris-md);
+    margin-top: 40px;
+  }
+  .footer span { color: var(--azul); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .header { padding: 28px 20px; }
+    .ref-grid { grid-template-columns: 1fr; }
+    .step-num { min-width: 52px; font-size: 20px; }
+  }
+
+  @media print {
+    body { background: white; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .step-num { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="badge">Real Estate Finance · Modeling Team</div>
+  <h1>🐾 Guía de Uso — Walton</h1>
+  <p>Agente de análisis de márgenes BAE. Sigue estos 4 pasos para procesar cualquier mes, actualizar el dashboard y compartir el link con tu equipo.</p>
+  <div class="link-box">
+    🌐 Link del Dashboard:&nbsp;
+    <a href="https://bae-dashboard.github.io/analisis-margen-bae/" target="_blank">
+      bae-dashboard.github.io/analisis-margen-bae/
+    </a>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="container">
+
+  <!-- REQUISITO -->
+  <div class="requisito">
+    <strong>⚙️ Requisito único:</strong> Debes estar conectado a <strong>VPN Walmart</strong> o a la red <strong>Eagle WiFi</strong> para que Walton pueda acceder a los archivos en OneDrive. Sin conexión, los archivos no son visibles.
+  </div>
+
+  <!-- PASOS -->
+  <div class="section-title">Proceso paso a paso</div>
+
+  <div class="steps">
+
+    <!-- PASO 1 -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h2><span class="icon">💬</span> Abre el agente Walton</h2>
+        <p>Accede a <strong>Code Puppy</strong> desde tu navegador o aplicación. Walton ya está configurado con toda la lógica de extracción y el acceso a OneDrive.</p>
+        <div class="nota">
+          <span class="ico">💡</span>
+          <span>Si es tu primera vez, solicita el acceso al agente con el ID: <strong>analisis-margen-bae-c0fc13</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h2><span class="icon">🗓️</span> Dile a Walton qué mes procesar</h2>
+        <p>Escribe en el chat el siguiente mensaje, sustituyendo el mes y la cantidad de proyectos correspondiente:</p>
+        <div class="cmd chat">
+          <span class="label">Mensaje al chat</span>
+          vamos a trabajar con <strong>[MES]</strong>. son <strong>[N]</strong> proyectos nuevos y <strong>[N]</strong> reps. cuando termines quiero que abras el html para asegurarme de que esta toda la info de forma correcta. Adelante Walton.
+        </div>
+        <p style="margin-top:10px;"><strong>Ejemplo real:</strong></p>
+        <div class="cmd chat">
+          <span class="label">Ejemplo</span>
+          vamos a trabajar con julio. son 48 proyectos nuevos y 0 reps. cuando termines quiero que abras el html para asegurarme de que esta toda la info de forma correcta. Adelante Walton.
+        </div>
+        <div class="nota">
+          <span class="ico">⏱️</span>
+          <span>Walton tarda aproximadamente <strong>3–8 minutos</strong> dependiendo del número de proyectos. Abrirá el dashboard automáticamente al terminar para que puedas verificar la información.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h2><span class="icon">🚀</span> Publica el dashboard actualizado</h2>
+        <p>Una vez que Walton termine y hayas verificado que la información es correcta, abre una terminal de Windows (<strong>Win + R → cmd → Enter</strong>) y ejecuta:</p>
+        <div class="cmd">
+          <span class="label">Terminal (cmd)</span>
+          python C:\Users\e0b06ke\Documents\puppy_workspace\publicar_dashboard.py
+        </div>
+        <p>El script hace todo automáticamente:</p>
+        <ul style="font-size:14px; color:#444; margin: 8px 0 0 18px; line-height:2;">
+          <li>Toma el HTML más reciente del workspace</li>
+          <li>Lo sube a GitHub</li>
+          <li>El link público se actualiza en <strong>~30 segundos</strong></li>
+        </ul>
+        <div class="nota">
+          <span class="ico">✅</span>
+          <span>Cuando el script imprima <strong>"Dashboard publicado correctamente"</strong>, el link ya está listo para compartir.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="step final">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h2><span class="icon">🔗</span> Comparte el link — siempre el mismo</h2>
+        <p>Este link es <strong>permanente</strong>. No cambia nunca, aunque actualices el contenido. Compártelo por correo, Teams o WhatsApp:</p>
+        <div class="cmd url">
+          https://bae-dashboard.github.io/analisis-margen-bae/
+        </div>
+        <div class="nota">
+          <span class="ico">🌍</span>
+          <span><strong>Cualquier persona</strong> puede abrirlo desde cualquier dispositivo y navegador, sin necesidad de cuenta de GitHub ni VPN.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- REFERENCIA RÁPIDA -->
+  <div class="section-title">Referencia rápida</div>
+
+  <div class="ref-grid">
+    <div class="ref-card">
+      <h3>🌐 Link permanente del dashboard</h3>
+      <p><a href="https://bae-dashboard.github.io/analisis-margen-bae/" target="_blank">bae-dashboard.github.io/<br>analisis-margen-bae/</a></p>
+    </div>
+    <div class="ref-card amarillo">
+      <h3>📁 Workspace local</h3>
+      <p>C:\Users\e0b06ke\Documents\<br>puppy_workspace\</p>
+    </div>
+    <div class="ref-card verde">
+      <h3>📤 Script de publicación</h3>
+      <p>publicar_dashboard.py<br><span style="font-weight:400; color:#555;">en la carpeta workspace</span></p>
+    </div>
+    <div class="ref-card">
+      <h3>🤖 ID del Agente</h3>
+      <p>analisis-margen-bae-c0fc13</p>
+    </div>
+  </div>
+
+  <!-- MESES DISPONIBLES -->
+  <div class="section-title">Meses válidos para procesar</div>
+
+  <div style="background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+    <div style="display:flex; flex-wrap:wrap; gap:10px;">
+      <span class="tag verde">Enero ✓</span>
+      <span class="tag verde">Febrero ✓</span>
+      <span class="tag verde">Marzo ✓</span>
+      <span class="tag verde">Abril ✓</span>
+      <span class="tag verde">Mayo ✓</span>
+      <span class="tag verde">Junio ✓</span>
+      <span class="tag verde">Julio ✓</span>
+      <span class="tag azul">Agosto</span>
+      <span class="tag azul">Septiembre</span>
+      <span class="tag azul">Octubre</span>
+      <span class="tag azul">Noviembre</span>
+      <span class="tag azul">Diciembre</span>
+    </div>
+    <p style="font-size:12px; color:#888; margin-top:12px;">
+      <span class="tag verde">Verde</span> = procesado y acumulado en el dashboard &nbsp;|&nbsp;
+      <span class="tag azul">Azul</span> = disponible para procesar cuando llegue el mes
+    </p>
+  </div>
+
+  <!-- PREGUNTAS FRECUENTES -->
+  <div class="section-title">Preguntas frecuentes</div>
+
+  <div style="display:flex; flex-direction:column; gap:12px;">
+
+    <div style="background:white; border-radius:10px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <p style="font-weight:700; color:var(--azul-dk); margin-bottom:4px;">❓ ¿El link cambia cada vez que actualizo?</p>
+      <p style="font-size:14px; color:#555;">No. El link es permanente. Siempre es el mismo aunque el contenido se actualice.</p>
+    </div>
+
+    <div style="background:white; border-radius:10px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <p style="font-weight:700; color:var(--azul-dk); margin-bottom:4px;">❓ ¿Necesito VPN para ver el dashboard?</p>
+      <p style="font-size:14px; color:#555;">No. El dashboard es público. Cualquier persona lo puede abrir sin VPN ni cuenta. La VPN solo la necesita quien <em>procesa</em> los archivos con Walton.</p>
+    </div>
+
+    <div style="background:white; border-radius:10px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <p style="font-weight:700; color:var(--azul-dk); margin-bottom:4px;">❓ ¿Qué hago si Walton dice que no encuentra los archivos?</p>
+      <p style="font-size:14px; color:#555;">Verifica que estés conectado a VPN o Eagle WiFi y que los archivos del mes ya estén en la carpeta correcta de OneDrive (<code>REC › BAE › 2026 › [mes]</code>).</p>
+    </div>
+
+    <div style="background:white; border-radius:10px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <p style="font-weight:700; color:var(--azul-dk); margin-bottom:4px;">❓ ¿Puedo procesar más de un mes a la vez?</p>
+      <p style="font-size:14px; color:#555;">No. Procesa un mes a la vez. El dashboard es acumulativo — cada mes nuevo se suma a los anteriores automáticamente.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Generado por <span>Walton</span> · Real Estate Finance Modeling · Walmart México &nbsp;|&nbsp;
+  Dashboard: <a href="https://bae-dashboard.github.io/analisis-margen-bae/" style="color:var(--azul);">bae-dashboard.github.io/analisis-margen-bae/</a>
+</div>
+
+</body>
+</html>
