@@ -1,0 +1,4066 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Análisis Margen</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: Calibri, 'Segoe UI', sans-serif; background:#f5f7fa; color:#1A1A1A; }
+  .kpi-card { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:1.25rem 1.5rem; }
+  .kpi-card-featured { background:#f0f4ff; border-left:4px solid #0053E2; border-radius:12px; box-shadow:0 4px 14px rgba(0,83,226,.12); padding:1.25rem 1.5rem; }
+  .kpi-card-featured .kpi-val { color:#0053E2; }
+  .kpi-card-featured .kpi-lbl { color:#374151; }
+  .kpi-val  { font-size:2rem; font-weight:700; color:#0053E2; }
+  .kpi-lbl  { font-size:.8rem; color:#555; text-transform:uppercase; letter-spacing:.05em; margin-top:.15rem; }
+  .section  { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:1.5rem; margin-bottom:1.5rem; }
+  .section-title { font-size:1.05rem; font-weight:700; color:#0053E2; margin-bottom:1rem; border-bottom:2px solid #FFC220; padding-bottom:.4rem; }
+  table { width:100%; border-collapse:collapse; font-size:.78rem; }
+  th { background:#0053E2; color:white; padding:.55rem .6rem; text-align:left; font-weight:600; white-space:nowrap; position:sticky; top:0; z-index:10; }
+  td { padding:.5rem .6rem; vertical-align:top; border-bottom:1px solid #e5e7eb; }
+  .row-alt { background:#f8faff; }
+  .td-nombre { font-weight:600; min-width:160px; }
+  .td-num    { text-align:center; white-space:nowrap; }
+  .td-center { text-align:center; }
+  .td-long   { min-width:140px; max-width:220px; word-break:break-word; }
+  .badge { display:inline-block; padding:.2rem .55rem; border-radius:999px; font-size:.72rem; font-weight:600; }
+  .badge-green  { background:#d1fae5; color:#2a8703; }
+  .badge-amber  { background:#fef3c7; color:#995213; }
+  .badge-gray   { background:#f3f4f6; color:#6b7280; }
+  .badge-blue   { background:#dbeafe; color:#0053e2; }
+  .badge-purple { background:#ede9fe; color:#6d28d9; }
+  .badge-ene  { background:#e0f2fe;color:#0369a1 }
+  .badge-feb  { background:#f5f3ff;color:#7c3aed }
+  .badge-mar  { background:#dcfce7;color:#166534 }
+  .badge-abr  { background:#fdf2f8;color:#db2777 }
+  .badge-mayo  { background:#ede9fe;color:#6d28d9 }
+  .badge-junio  { background:#dbeafe;color:#0053e2 }
+  .badge-jul  { background:#ffedd5;color:#ea580c }
+  .badge-ago  { background:#fef2f2;color:#dc2626 }
+  .badge-sep  { background:#fffbeb;color:#d97706 }
+  .badge-oct  { background:#fef3c7;color:#92400e }
+  .badge-nov  { background:#f9fafb;color:#374151 }
+  .badge-dic  { background:#f3f4f6;color:#6b7280 }
+  .insight-bar  { border-left:4px solid #FFC220; background:#fffbeb; padding:.75rem 1rem; border-radius:0 8px 8px 0; margin-bottom:1rem; }
+  /* Month pills */
+  .pill-group { display:flex; gap:.5rem; }
+  .pill { cursor:pointer; padding:.35rem 1rem; border-radius:999px; font-size:.82rem; font-weight:600;
+           border:2px solid #d1d5db; color:#374151; background:white; transition:all .15s; user-select:none; }
+  .pill:hover { border-color:#0053e2; color:#0053e2; }
+  .pill.active { background:#0053e2; color:white; border-color:#0053e2; }
+  /* Plan Proximidad banner */
+  .prox-banner  { display:flex; flex-wrap:wrap; gap:0; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); margin-bottom:1.5rem; overflow:hidden; }
+  .prox-item    { display:flex; align-items:flex-start; gap:.75rem; padding:1rem 1.5rem; flex:1; min-width:280px; }
+  .prox-icon    { font-size:1.4rem; margin-top:.05rem; flex-shrink:0; }
+  .prox-title   { font-size:.82rem; font-weight:700; color:#1A1A1A; margin-bottom:.25rem; }
+  .prox-states  { font-size:.78rem; color:#555; line-height:1.6; }
+  .prox-bps     { display:inline-block; background:#fef3c7; color:#995213; font-size:.72rem; font-weight:700; padding:.1rem .45rem; border-radius:999px; margin-left:.35rem; vertical-align:middle; }
+  .prox-mayor   { border-left:4px solid #0053E2; }
+  .prox-menor   { border-left:4px solid #FFC220; }
+  .prox-divider { width:1px; background:#e5e7eb; margin:.75rem 0; flex-shrink:0; }
+  /* Multi-select dropdowns */
+  .msel { position:relative; user-select:none; }
+  .msel-trigger { display:flex; align-items:center; gap:.4rem; cursor:pointer; border:1px solid #d1d5db;
+                   border-radius:.5rem; padding:.35rem .75rem; font-size:.8rem; background:white;
+                   white-space:nowrap; min-width:150px; }
+  .msel-trigger:hover { border-color:#0053e2; }
+  .msel-label { flex:1; color:#374151; font-weight:500; }
+  .msel-count { background:#0053e2; color:white; border-radius:999px; padding:.05rem .45rem;
+                 font-size:.68rem; font-weight:700; display:none; margin-left:.2rem; }
+  .msel-count.active { display:inline; }
+  .msel-arrow { font-size:.65rem; color:#9ca3af; }
+  .msel-panel { display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:200; background:white;
+                 border:1px solid #d1d5db; border-radius:.5rem; box-shadow:0 4px 16px rgba(0,0,0,.12);
+                 min-width:200px; flex-direction:column; }
+  .msel-panel.open { display:flex; }
+  .msel-search input { width:100%; border:none; border-bottom:1px solid #e5e7eb; padding:.4rem .65rem;
+                        font-size:.78rem; outline:none; box-sizing:border-box; }
+  .msel-options { overflow-y:auto; max-height:220px; }
+  .msel-opt { display:flex; align-items:center; gap:.5rem; padding:.35rem .65rem; font-size:.78rem; color:#374151; }
+  .msel-opt:hover { background:#f0f4ff; cursor:pointer; }
+  .msel-opt.unavail { opacity:.3; }
+  .msel-opt input[type=checkbox] { accent-color:#0053e2; width:14px; height:14px; flex-shrink:0; cursor:pointer; }
+  .msel-opt label { cursor:pointer; flex:1; line-height:1.4; }
+</style>
+</head>
+<body class="p-6">
+
+<!-- Header -->
+<div style="background:#0053E2" class="text-white rounded-xl px-8 py-5 mb-4 flex items-center justify-between">
+  <div>
+    <div class="text-xs font-semibold tracking-widest opacity-70 mb-1">FINANZAS REAL ESTATE</div>
+    <h1 class="text-2xl font-bold">Análisis Margen</h1>
+    <div class="text-sm opacity-80 mt-1" id="kpiHeader">Mayo · Junio 2026 · 193 proyectos</div>
+  </div>
+  <div class="text-right">
+    <div style="background:#FFC220" class="text-gray-900 font-bold px-4 py-1 rounded-lg text-sm" id="headerMesBadge">Mayo · Junio 2026</div>
+  </div>
+</div>
+
+<!-- Barra 1: Selector de mes -->
+<div class="section mb-2 py-3 px-5">
+  <div class="flex items-center gap-4 flex-wrap">
+    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">REC</span>
+    <div class="pill-group">
+      <div class="pill active" id="pill-todos" onclick="selectTodos()">Todos</div>
+      <div class="pill" id="pill-enero-2026" onclick="toggleMes('Enero 2026')">Enero</div>
+      <div class="pill" id="pill-febrero-2026" onclick="toggleMes('Febrero 2026')">Febrero</div>
+      <div class="pill" id="pill-marzo-2026" onclick="toggleMes('Marzo 2026')">Marzo</div>
+      <div class="pill" id="pill-abril-2026" onclick="toggleMes('Abril 2026')">Abril</div>
+      <div class="pill" id="pill-mayo-2026" onclick="toggleMes('Mayo 2026')">Mayo</div>
+      <div class="pill" id="pill-junio-2026" onclick="toggleMes('Junio 2026')">Junio</div>
+      <div class="pill" id="pill-julio-2026" onclick="toggleMes('Julio 2026')">Julio</div>
+    </div>
+  </div>
+</div>
+
+<!-- Barra 2: Detalle por mes -->
+<div class="section mb-4 py-2 px-5">
+  <div class="flex items-center gap-6 flex-wrap">
+    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Detalle</span>
+    <span class="text-xs text-gray-600" id="det-enero-2026"><span class="badge badge-ene">Enero</span> <span class="font-semibold ml-1">8 proy.</span> <span class="text-gray-400 ml-1">0 New &nbsp;&middot;&nbsp; 8 REP</span></span>
+    <span class="text-xs text-gray-600" id="det-febrero-2026"><span class="badge badge-feb">Febrero</span> <span class="font-semibold ml-1">26 proy.</span> <span class="text-gray-400 ml-1">19 New &nbsp;&middot;&nbsp; 7 REP</span></span>
+    <span class="text-xs text-gray-600" id="det-marzo-2026"><span class="badge badge-mar">Marzo</span> <span class="font-semibold ml-1">18 proy.</span> <span class="text-gray-400 ml-1">10 New &nbsp;&middot;&nbsp; 8 REP</span></span>
+    <span class="text-xs text-gray-600" id="det-abril-2026"><span class="badge badge-abr">Abril</span> <span class="font-semibold ml-1">24 proy.</span> <span class="text-gray-400 ml-1">16 New &nbsp;&middot;&nbsp; 8 REP</span></span>
+    <span class="text-xs text-gray-600" id="det-mayo-2026"><span class="badge badge-mayo">Mayo</span> <span class="font-semibold ml-1">19 proy.</span> <span class="text-gray-400 ml-1">12 New &nbsp;&middot;&nbsp; 7 REP</span></span>
+    <span class="text-xs text-gray-600" id="det-junio-2026"><span class="badge badge-junio">Junio</span> <span class="font-semibold ml-1">50 proy.</span> <span class="text-gray-400 ml-1">36 New &nbsp;&middot;&nbsp; 14 REP</span></span>
+    <span class="text-xs text-gray-600" id="det-julio-2026"><span class="badge badge-jul">Julio</span> <span class="font-semibold ml-1">48 proy.</span> <span class="text-gray-400 ml-1">48 New &nbsp;&middot;&nbsp; 0 REP</span></span>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div class="kpi-card" style="border-left:4px solid #FFC220">
+    <div class="kpi-val text-blue-700" id="kpiTotal">193</div>
+    <div class="kpi-lbl">Total Proyectos</div>
+    <div class="text-xs text-gray-400 mt-1" id="kpiTotalDetalle">Enero: 8 (0 New · 8 REP) · Febrero: 26 (19 New · 7 REP) · Marzo: 18 (10 New · 8 REP) · Abril: 24 (16 New · 8 REP) · Mayo: 19 (12 New · 7 REP) · Junio: 50 (36 New · 14 REP) · Julio: 48 (48 New · 0 REP)</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val" id="kpiAvgProto">—</div>
+    <div class="kpi-lbl" id="kpiAvgProtoLbl">Margen Proto Prom.</div>
+  </div>
+  <div class="kpi-card kpi-card-featured">
+    <div class="kpi-val" id="kpiAvg">—</div>
+    <div class="kpi-lbl" id="kpiAvgLbl">Margen Proyecto Prom.</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val" id="kpiMayor">—</div>
+    <div class="kpi-lbl">Mayor a Proto</div>
+  </div>
+</div>
+
+<!-- ── Cintillo Plan Proximidad ── -->
+<div class="prox-banner">
+  <div class="prox-item prox-mayor">
+    <span class="prox-icon">📍</span>
+    <div>
+      <div class="prox-title">Plan de Proximidad Activo &gt;12 Meses</div>
+      <div class="prox-states">Ciudad de México &middot; Estado de México &middot; Guanajuato &middot; Puebla &middot; Veracruz</div>
+    </div>
+  </div>
+  <div class="prox-divider"></div>
+  <div class="prox-item prox-menor">
+    <span class="prox-icon">📌</span>
+    <div>
+      <div class="prox-title">Plan de Proximidad Activo &lt;12 Meses <span class="prox-bps">−140 Bps</span></div>
+      <div class="prox-states">Aguascalientes &middot; Guerrero &middot; Hidalgo &middot; Jalisco &middot; Michoacán &middot; Querétaro &middot; Tlaxcala &middot; San Luis Potosí</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="section">
+  <div class="section-title">📋 Detalle por Proyecto</div>
+
+  <!-- Filtros -->
+  <div class="flex flex-wrap gap-3 mb-4 items-end">
+    <div class="flex flex-col gap-1">
+      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Nombre</span>
+      <div class="msel" id="dd-nombre">
+        <div class="msel-trigger" onclick="toggleDD('dd-nombre')">
+          <span class="msel-label">Todos</span>
+          <span class="msel-count" id="dd-nombre-count"></span>
+          <span class="msel-arrow">▾</span>
+        </div>
+        <div class="msel-panel" id="dd-nombre-panel">
+          <div class="msel-search"><input type="text" placeholder="Buscar..." oninput="filterDDSearch(this,'dd-nombre')"></div>
+          <div class="msel-options" id="dd-nombre-opts"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</span>
+      <div class="msel" id="dd-estado">
+        <div class="msel-trigger" onclick="toggleDD('dd-estado')">
+          <span class="msel-label">Todos</span>
+          <span class="msel-count" id="dd-estado-count"></span>
+          <span class="msel-arrow">▾</span>
+        </div>
+        <div class="msel-panel" id="dd-estado-panel">
+          <div class="msel-search"><input type="text" placeholder="Buscar..." oninput="filterDDSearch(this,'dd-estado')"></div>
+          <div class="msel-options" id="dd-estado-opts"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo</span>
+      <div class="msel" id="dd-tipo">
+        <div class="msel-trigger" onclick="toggleDD('dd-tipo')">
+          <span class="msel-label">Todos</span>
+          <span class="msel-count" id="dd-tipo-count"></span>
+          <span class="msel-arrow">▾</span>
+        </div>
+        <div class="msel-panel" id="dd-tipo-panel">
+          <div class="msel-options" id="dd-tipo-opts"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Proto</span>
+      <div class="msel" id="dd-proto">
+        <div class="msel-trigger" onclick="toggleDD('dd-proto')">
+          <span class="msel-label">Todos</span>
+          <span class="msel-count" id="dd-proto-count"></span>
+          <span class="msel-arrow">▾</span>
+        </div>
+        <div class="msel-panel" id="dd-proto-panel">
+          <div class="msel-options" id="dd-proto-opts"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Proximidad</span>
+      <div class="msel" id="dd-proximidad">
+        <div class="msel-trigger" onclick="toggleDD('dd-proximidad')">
+          <span class="msel-label">Todos</span>
+          <span class="msel-count" id="dd-proximidad-count"></span>
+          <span class="msel-arrow">▾</span>
+        </div>
+        <div class="msel-panel" id="dd-proximidad-panel">
+          <div class="msel-options" id="dd-proximidad-opts"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Operador</span>
+      <div class="msel" id="dd-operador">
+        <div class="msel-trigger" onclick="toggleDD('dd-operador')">
+          <span class="msel-label">Todos</span>
+          <span class="msel-count" id="dd-operador-count"></span>
+          <span class="msel-arrow">▾</span>
+        </div>
+        <div class="msel-panel" id="dd-operador-panel">
+          <div class="msel-options" id="dd-operador-opts"></div>
+        </div>
+      </div>
+    </div>
+    <button onclick="limpiarFiltros()"
+      class="px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+      Limpiar filtros
+    </button>
+    <span id="contadorFilas" class="text-xs text-gray-400 self-end pb-1.5"></span>
+  </div>
+
+  <div style="overflow-x:auto; max-height:560px; overflow-y:auto;">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th>Tipo</th>
+          <th>Proyecto</th>
+          <th>Proto</th>
+          <th>Estado</th>
+          <th>Ciudad</th>
+          <th>Margen Proto</th>
+          <th>Margen Proy.</th>
+          <th>Estatus</th>
+          <th>Margen Estado Mismo Proto</th>
+          <th>Margen Estado</th>
+          <th>GP &lt;10km</th>
+          <th>Explicacion</th>
+          <th>Determinantes</th>
+          <th>Canibalizacion</th>
+          <th>Competidor</th>
+          <th>Proximidad</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="text-xs text-gray-400 text-center mt-4">
+  Generado por Walton (Code Puppy) · Real Estate Finance &amp; Modeling · Junio 2026
+</div>
+
+<script>
+const ALL_DATA = [
+  {
+    "nombre": "Av del Sauce SLP",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.0,
+    "margen_proy": 21.89,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 24.08,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "53",
+    "canibalizacion": "53",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Calle 99",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.0,
+    "margen_proy": 21.89,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 22.7,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "2838",
+    "canibalizacion": "2838",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Crespo",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de Celaya",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.0,
+    "margen_proy": 21.67,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 27.3,
+    "explicacion": "Margen alineado a tiendas cercanas con Plan de Activo",
+    "determinantes": "6437, 1175, 1895",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Jaguey",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Minatitlán",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.75,
+    "margen_proy": 20.66,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 19.36,
+    "explicacion": "Margen alineado a tienda cercana ",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Lago Pojoj",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.0,
+    "margen_proy": 21.33,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 22.41,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "2972",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Los Magueyes SLP",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.0,
+    "margen_proy": 21.66,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 21.95,
+    "explicacion": "Mrgen alineado a cercanas comparables con Plan Activo",
+    "determinantes": "53, 5696, 1298, 2553, 3704",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "López Mateos SLP",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.0,
+    "margen_proy": 21.69,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 21.91,
+    "explicacion": "Margen alineado a cercanas comparables con Plan Activo",
+    "determinantes": "5696, 3706, 2553, 3704, 1298, 2973",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Super Bara, Neto"
+  },
+  {
+    "nombre": "Paisanos ",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Enero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.0,
+    "margen_proy": 21.89,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 23.98,
+    "explicacion": "N/A",
+    "determinantes": "5696",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Altavela Vallarta",
+    "estado": "Nayarit",
+    "ciudad": "ZM de Puerto Vallarta",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.67,
+    "margen_estado_proto": 22.7,
+    "margen_estado": 22.7,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado al estado",
+    "determinantes": "2536, 1572, 2534",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Blvd. Calafia",
+    "estado": "Baja California",
+    "ciudad": "ZM de Tijuana",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.95,
+    "margen_proy": 22.77,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tiendas comprables",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Oxxo"
+  },
+  {
+    "nombre": "Colinas Universo",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.17,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "3957",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Constitución Minatitlán",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Minatitlán",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.89,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tiendas operando en Coatzatcoalcos con Plan Activo ",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "El Dorado Celaya",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de Celaya",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.32,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 21.7,
+    "explicacion": "Margen alineado a tiendas cercanas con Plan Activo",
+    "determinantes": "6432, 1178, 1415, 1175, 1895",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Encarnación Ortiz (Adap)",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 21.35,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.71,
+    "explicacion": "N/A",
+    "determinantes": "3331, 1673",
+    "canibalizacion": "2237",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Fracc Altavela Vallarta",
+    "estado": "Nayarit",
+    "ciudad": "ZM de Puerto Vallarta",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.67,
+    "margen_estado_proto": 22.7,
+    "margen_estado": 22.7,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado al estado",
+    "determinantes": "2536, 1572, 2534",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Jardin Alameda (Adap)",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de Querétaro",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.73,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tienda comparable con plan proximidad activo",
+    "determinantes": "4752, 6569",
+    "canibalizacion": "2086",
+    "competidor": "3B, 3B"
+  },
+  {
+    "nombre": "Lindavista Texmelucan ",
+    "estado": "Puebla",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.15,
+    "margen_estado_proto": 21.34,
+    "margen_estado": 21.34,
+    "gp_promedio": 21.15,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "5100",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui, 3B"
+  },
+  {
+    "nombre": "Loma Alta (Adap)",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.5,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 22.12,
+    "explicacion": "Margen alineado a tiendas cercanas comparables",
+    "determinantes": "3700",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": " Martinelli ",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 2",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 19.6,
+    "margen_proy": 20.5,
+    "margen_estado_proto": 21.52,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.19,
+    "explicacion": "Margen alineado a tienda comparable en competencia y proto con Plan Activo",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui, 3B"
+  },
+  {
+    "nombre": "Playa Xel-Ha",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Dunosusa, Super Willy S, Super Willy S"
+  },
+  {
+    "nombre": "Pozo 13",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Poza Rica",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.89,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tiendas operando en Coatzatcoalcos con Plan Activo ",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Prado Norte Cancun",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.34,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 21.84,
+    "explicacion": "Margen alineado a cercanas comparables con mismo competidor",
+    "determinantes": "5271, 5282, 5281",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Willy S, Dunosusa, Dunosusa, Super Willy S"
+  },
+  {
+    "nombre": "Real Navarra",
+    "estado": "Hidalgo",
+    "ciudad": "ZM de Pachuca",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 22.54,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 23.37,
+    "explicacion": "Margen alineado a cercanas con Plan Activo",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "República de Honduras",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Coatzacoalcos",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.89,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 21.03,
+    "explicacion": "Margen alineado a tiendas operando en ZM de Coatzacoalcos con plan activo",
+    "determinantes": "---",
+    "canibalizacion": "1484",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Transportistas Coatzacoalcos",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Coatzacoalcos",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.89,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 21.02,
+    "explicacion": "Margen alineado a tiendas operando en ZM de Coatzacoalcos con plan activo",
+    "determinantes": "1632, 1484, 2495, 2494, 2967, 2968",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Tulipan Ciudad Natura",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.1,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 21.97,
+    "explicacion": "Margen alineado a tienda cercana comprable",
+    "determinantes": "5271",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Dunosusa"
+  },
+  {
+    "nombre": "Vistas de Mitras Garcia",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.02,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.91,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "5676, 1885",
+    "canibalizacion": "5676",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Fraccionamiento Hacienda San Miguel ",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.66,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 22.58,
+    "explicacion": "N/A",
+    "determinantes": "3595, 5156",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Frutos de la Revolución",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Coatzacoalcos",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.69,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 21.03,
+    "explicacion": "N/A",
+    "determinantes": "2967, 1484, 2969, 1632, 2968, 2495, 2494",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "La Joya Queretaro",
+    "estado": "Queretaro",
+    "ciudad": "ZM de Querétaro",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.4,
+    "margen_estado_proto": 22.42,
+    "margen_estado": 22.42,
+    "gp_promedio": 22.36,
+    "explicacion": "N/A",
+    "determinantes": "2329, 2912",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Mar Caribe",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.33,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 21.43,
+    "explicacion": "Margen alineado a tiendas cercanas comparables ",
+    "determinantes": "874, 5280, 5275, 5390",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Willy S"
+  },
+  {
+    "nombre": "San Francisco 5ta Poniente",
+    "estado": "Chiapas",
+    "ciudad": "ZM de Tuxtla Gutiérrez",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.44,
+    "margen_estado_proto": 21.54,
+    "margen_estado": 21.54,
+    "gp_promedio": 21.65,
+    "explicacion": "Margen alineado a tiendas cercanas comparables ",
+    "determinantes": "2498, 1461, 2499, 2964",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Pitico, Super Willy S"
+  },
+  {
+    "nombre": "Santa Victoria Reynosa",
+    "estado": "Tamaulipas",
+    "ciudad": "ZM de Reynosa",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.46,
+    "margen_estado_proto": 21.91,
+    "margen_estado": 21.91,
+    "gp_promedio": 21.92,
+    "explicacion": "Margen alineado a tiendas cercanas comparables. ",
+    "determinantes": "210, 6429, 1469, 6457",
+    "canibalizacion": "210",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Trinidad Sanctorum",
+    "estado": "Puebla",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Febrero 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.03,
+    "margen_estado_proto": 21.34,
+    "margen_estado": 21.34,
+    "gp_promedio": 22.78,
+    "explicacion": "Margen alineado a tiendas cercanas comparables",
+    "determinantes": "5003, 1999",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Neto"
+  },
+  {
+    "nombre": "Avantho",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.29,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 22.99,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "3704, 53, 2973",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Calzada Sendas Qro",
+    "estado": "Queretaro",
+    "ciudad": "ZM de Querétaro",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 22.62,
+    "margen_estado_proto": 22.42,
+    "margen_estado": 22.42,
+    "gp_promedio": 23.91,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "2581",
+    "canibalizacion": "7061",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Camino a Refinería",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Minatitlán",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.5,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 25.87,
+    "explicacion": "Margen alineado a ZM de Coatzacoalcos",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Lomas del Vergel",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 20.5,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 21.72,
+    "explicacion": "Margen alineado a cercanas comparables sin competidor",
+    "determinantes": "2196, 3251, 3336, 3258",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Luis Spota (Adap)",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 2",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 19.6,
+    "margen_proy": 20.66,
+    "margen_estado_proto": 21.52,
+    "margen_estado": 20.36,
+    "gp_promedio": 21.99,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui"
+  },
+  {
+    "nombre": "Maderas",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.64,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.42,
+    "explicacion": "Margen alineado a cercanas comparables sin competidor",
+    "determinantes": "5006, 3120",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Real del Valle",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Saltillo",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.52,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 21.31,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "1364, 5289, 1268, 1666, 2518",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Rinconada San Francisco (Adap)",
+    "estado": "Hidalgo",
+    "ciudad": "ZM de Pachuca",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.23,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 23.24,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "2571, 5326, 4874, 6416",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Santa María Celta",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.6,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 22.05,
+    "explicacion": "Margen alineado a la unidad impactada",
+    "determinantes": "2337",
+    "canibalizacion": "2337",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villas de Santa Martha",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Coatzacoalcos",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.5,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 21.28,
+    "explicacion": "Margen alineado a ZM de Coatzacoalcos (alineado a proto)",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Neto"
+  },
+  {
+    "nombre": "Chuburná Mérida",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.93,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": 23.14,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "2254",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Dunosusa, Dunosusa, Dunosusa, Super Aki, Dunosusa"
+  },
+  {
+    "nombre": "Fraccionamiento Punta Azul",
+    "estado": "Hidalgo",
+    "ciudad": "ZM de Pachuca",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 22.03,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 23.12,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Héroes Norte",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.93,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": 23.19,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "2254",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "La Libertad",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.35,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 22.06,
+    "explicacion": "Margen alineado a tiendas cercanas con plan activo.",
+    "determinantes": "3704, 2973, 5696",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, 3B"
+  },
+  {
+    "nombre": "Portal del Fraile",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 20.9,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.25,
+    "explicacion": "Margen alineado a unidad impactada",
+    "determinantes": "3269",
+    "canibalizacion": "3163, 3269",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Residencial Santa Lucia",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.54,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.06,
+    "explicacion": "Margen alineado a cercanas comparables sin competidor",
+    "determinantes": "2192, 3384, 4857, 857, 1994, 1372, 5209",
+    "canibalizacion": "1330",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villa de Palmanova",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.78,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": null,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villa Oriente",
+    "estado": "Michoacan",
+    "ciudad": "ZM de Morelia",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Marzo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 22.11,
+    "margen_estado_proto": 22.1,
+    "margen_estado": 22.1,
+    "gp_promedio": 22.26,
+    "explicacion": "Margen alineado a cercanas comaprables",
+    "determinantes": "3999, 3696",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Av Toledo NL",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.0,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.72,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "1355",
+    "canibalizacion": "1355",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Blvd Guadalupano la Florida",
+    "estado": "Aguascalientes",
+    "ciudad": "ZM de Aguascalientes",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 19.98,
+    "margen_estado_proto": 22.39,
+    "margen_estado": 22.39,
+    "gp_promedio": 21.33,
+    "explicacion": "Margen alineado a tienda comparable -140 Bps ",
+    "determinantes": "4845",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Blvd Mexico Torreon",
+    "estado": "Coahuila",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "—",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Blvd Vista Reina",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.21,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.52,
+    "explicacion": "Margen alineado a tienda impactada -140 Bps",
+    "determinantes": "4721",
+    "canibalizacion": "4721",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Canal de la Concha Torreon",
+    "estado": "Coahuila",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "—",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Conde Lemus",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de Guanajuato",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.05,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tiendas comparables con plan activo",
+    "determinantes": "5420, 5444",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Hacienda Santa Cruz ",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.19,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.33,
+    "explicacion": "Margen alineado a tiendas comaprables -140 Bps",
+    "determinantes": "3120, 2439, 3380, 3972, 3136, 3975, 2005, 3976",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Heroes Cienega",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.15,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.55,
+    "explicacion": "Margen alienado a tiendas cercanas comparables ",
+    "determinantes": "5057, 3385, 2403, 1217, 1889, 1723, 3687",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Las Haciendas Montecarlo",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.72,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.31,
+    "explicacion": "Margen alineado al promedio del estado sin competidor",
+    "determinantes": "—",
+    "canibalizacion": "5358",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Los Mangos",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Minatitlán",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.19,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 20.19,
+    "explicacion": "Margen alineado a tienda comaprable con plan activo",
+    "determinantes": "1658",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Naranjos 1er Sector ",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.81,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.35,
+    "explicacion": "Margen alineado a tiendas impactadas",
+    "determinantes": "2715, 3339",
+    "canibalizacion": "2715, 3339",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Real Almalfi (Adap)",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 24.31,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "—",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Real Bilbao",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 25.44,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "—",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Real Lucerna (Adap)",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 24.31,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "—",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Valle la Rioja ",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.91,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.77,
+    "explicacion": "Margen alineado a tiendas cercanas comparables",
+    "determinantes": "1451, 2836, 3266, 6488, 2367, 2369",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Zafiro Vallarta",
+    "estado": "Nayarit",
+    "ciudad": "ZM de Puerto Vallarta",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Abril 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.88,
+    "margen_estado_proto": 22.7,
+    "margen_estado": 22.7,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tiendas comaprables en el estado -140 Bps",
+    "determinantes": "2536, 2535, 1572, 2641",
+    "canibalizacion": "3549",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Bosques de Lindavista",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.3,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.78,
+    "explicacion": "N/A",
+    "determinantes": "3349",
+    "canibalizacion": "3349",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Colonia Mérida",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.54,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": 22.22,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "5327, 5391, 5320",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Dunosusa"
+  },
+  {
+    "nombre": "Fenix Tamaulipas",
+    "estado": "Tamaulipas",
+    "ciudad": "ZM de Reynosa",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.02,
+    "margen_estado_proto": 21.91,
+    "margen_estado": 21.91,
+    "gp_promedio": 22.12,
+    "explicacion": "N/A",
+    "determinantes": "4030, 873",
+    "canibalizacion": "4030",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Las Sombrillas",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.46,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.63,
+    "explicacion": "N/A",
+    "determinantes": "2763",
+    "canibalizacion": "2763",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Portal Buenavista",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.39,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.32,
+    "explicacion": "N/A",
+    "determinantes": "5125, 499",
+    "canibalizacion": "499, 5125",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Portales de Lincoln",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.28,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.9,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "5144",
+    "canibalizacion": "5144",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Terranova Apodaca",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.19,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.9,
+    "explicacion": "N/A",
+    "determinantes": "3993, 3579, 4892",
+    "canibalizacion": "3579, 3993, 4892",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Unión Tepeyac (Adap)",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Abril 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.42,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.47,
+    "explicacion": "N/A",
+    "determinantes": "2990",
+    "canibalizacion": "2990",
+    "competidor": "3B, Neto"
+  },
+  {
+    "nombre": "21 de Marzo",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Monclova-Frontera",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.81,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 22.5,
+    "explicacion": "Margen alineado a tiendas cercanas comparables",
+    "determinantes": "921, 872, 5425, 5424, 5447",
+    "canibalizacion": "5423",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Av Buenos Aires Torreon",
+    "estado": "Coahuila",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Ejercito de Oriente (MC)",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 19.52,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": -172.69,
+    "explicacion": "Margen alineado a tiendas cercanas con plan proximidad activo",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui"
+  },
+  {
+    "nombre": "Encinos Parajes del Valle ",
+    "estado": "Baja California",
+    "ciudad": "ZM de Tijuana",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.95,
+    "margen_proy": 23.16,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": 28.94,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "6462, 52",
+    "canibalizacion": "6745",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Explanada Vallarta",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Puerto Vallarta",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.1,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo  -140 Bps",
+    "determinantes": "3333, 3417, 2437, 5436",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Flor de Ciruelos",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 24.97,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Dunosusa, Super Willy S"
+  },
+  {
+    "nombre": "Heroes de Leon",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de León",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.28,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 20.41,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo",
+    "determinantes": "5186, 1283, 5145",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Mirador Colosio",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Saltillo",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.73,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 22.8,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "5289",
+    "canibalizacion": "5289",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Paseo de la Hacienda Renacimiento",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.53,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 19.08,
+    "explicacion": "Margen alineado a tiendas comaprables mismo estado",
+    "determinantes": "---",
+    "canibalizacion": "2192",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Real Valencia Cancun",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.73,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 21.78,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "5281, 5276, 5271, 5272",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "San Isidro Castillotla",
+    "estado": "Puebla",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.37,
+    "margen_estado_proto": 21.34,
+    "margen_estado": 21.34,
+    "gp_promedio": 22.65,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables con plan activo",
+    "determinantes": "1291, 3376, 2420, 2416, 1913",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Villas Lakin II",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.64,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 22.5,
+    "explicacion": "Margen alineado a tiendas cercanas comparables",
+    "determinantes": "5271, 5282, 1371, 5272, 5281, 6400",
+    "canibalizacion": "1383",
+    "competidor": "Super Willy S"
+  },
+  {
+    "nombre": "Arbolada",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.68,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.16,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables",
+    "determinantes": "3350, 5168, 2404, 2714, 3405",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Diamante Escobedo",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.77,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.45,
+    "explicacion": "Margen alineado a tiendas impactadas",
+    "determinantes": "3520",
+    "canibalizacion": "3520",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Heroes Lincoln",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.23,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.98,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "5144, 2311, 2556, 1059, 5406",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Mirador Apodaca Sur",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.12,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.94,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "5137",
+    "canibalizacion": "5137",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Pilares Antares",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.45,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.44,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "1889, 3687, 6537, 2022",
+    "canibalizacion": "1376",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Sendero Norte",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.84,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.66,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "2756, 2854, 3518, 1448, 4713, 3461, 5094",
+    "canibalizacion": "3513",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villa de los Arcos",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de Celaya",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Mayo 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.03,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 22.0,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "1178, 6432, 1175, 1415, 6437",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "21 de Marzo",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Monclova-Frontera",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.81,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 22.5,
+    "explicacion": "Margen alineado a tiendas cercanas comparables",
+    "determinantes": "921, 872, 5425, 5424, 5447",
+    "canibalizacion": "5423",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Alba Juarez",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.83,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.7,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "3457, 3471, 5225, 990, 5030, 3521, 4844",
+    "canibalizacion": "3457",
+    "competidor": "Mercadia"
+  },
+  {
+    "nombre": "Auranova",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.4,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 24.52,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "6480",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Auranova Lilis",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.4,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 24.52,
+    "explicacion": "Margen alineado a estado.",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Av Buenos Aires Torreon",
+    "estado": "Coahuila",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Blvd La Libertad Torreon",
+    "estado": "Coahuila",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Blvd Refugio Centro",
+    "estado": "Durango",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Caminos de Michoacan (Adap)",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 21.49,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 21.83,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo",
+    "determinantes": "1985, 1837, 5039, 2152, 2728, 3572",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Colonia Emiliano Zapata Sur",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.56,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": 23.02,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "5278, 6355, 5391",
+    "canibalizacion": "3758",
+    "competidor": "Dunosusa"
+  },
+  {
+    "nombre": "Desarrollo Quetzalcóatl",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 2",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 19.6,
+    "margen_proy": 20.72,
+    "margen_estado_proto": 21.52,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.13,
+    "explicacion": "Margen alineado a tiendas comparables proto 2 en CDMX ",
+    "determinantes": "---",
+    "canibalizacion": "1903",
+    "competidor": "Neto, Neto, Supercito Chedraui, 3B, 3B"
+  },
+  {
+    "nombre": "Ejercito de Oriente (MC)",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 19.52,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": -172.69,
+    "explicacion": "Margen alineado a tiendas cercanas con plan proximidad activo",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui"
+  },
+  {
+    "nombre": "Encinos Parajes del Valle ",
+    "estado": "Baja California",
+    "ciudad": "ZM de Tijuana",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.95,
+    "margen_proy": 23.16,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": 28.94,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "6462, 52",
+    "canibalizacion": "6745",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Estrellas Banthi",
+    "estado": "Queretaro",
+    "ciudad": "San Juan del Río",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.5,
+    "margen_estado_proto": 22.42,
+    "margen_estado": 22.42,
+    "gp_promedio": 23.23,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo -140 bps",
+    "determinantes": "4494, 1678, 5388, 2619, 2620, 4496",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Explanada Vallarta",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Puerto Vallarta",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 20.93,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo  -140 Bps",
+    "determinantes": "3333, 3417, 2437, 5436",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Flor de Ciruelos",
+    "estado": "Quintana Roo",
+    "ciudad": "Playa del Carmen",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 24.52,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Dunosusa, Super Willy S"
+  },
+  {
+    "nombre": "Hacienda Villamar",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.68,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 22.32,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "5439, 5282, 5271, 5307",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Heroes de Leon",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de León",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.28,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 20.41,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo",
+    "determinantes": "5186, 1283, 5145",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Hidalgo Monclova",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Monclova-Frontera",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.78,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 22.17,
+    "explicacion": "Margen alineado a tienda cercana comparable",
+    "determinantes": "5447, 5425, 921, 6559, 5424, 872, 847, 897",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Merco"
+  },
+  {
+    "nombre": "La Ciénega",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Saltillo",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.6,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 22.31,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "2518, 1364, 5289",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Las Campanas Cadereyta",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.17,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.63,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "1886, 5141, 4751",
+    "canibalizacion": "3208",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Leandro Valle(Adap)",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Monclova-Frontera",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.89,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 22.75,
+    "explicacion": "Margen alineado a tiendas cercanas comparables  ",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Lomas de Santa Anita",
+    "estado": "Tlaxcala",
+    "ciudad": "ZM de Tlaxcala-Apizaco",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.0,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto -140 Bps por plan próximidad activo",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Neto"
+  },
+  {
+    "nombre": "Mirador Colosio",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Saltillo",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.73,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 22.8,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "5289",
+    "canibalizacion": "5289",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Mixquic Centro ",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 2",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 19.6,
+    "margen_proy": 20.72,
+    "margen_estado_proto": 21.52,
+    "margen_estado": 20.36,
+    "gp_promedio": 21.23,
+    "explicacion": "Margen alineado a tiendas comparables proto 2 en CDMX ",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Neto, 3B"
+  },
+  {
+    "nombre": "Parques del Castillo",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.72,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 23.0,
+    "explicacion": "Margen alineado a unidad impactada con plan activo -140 Bps",
+    "determinantes": "2313, 4655, 5079, 4943",
+    "canibalizacion": "2313",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Paseo de la Hacienda Renacimiento",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.53,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 19.08,
+    "explicacion": "Margen alineado a tiendas comaprables mismo estado",
+    "determinantes": "---",
+    "canibalizacion": "2192",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Real Toledo",
+    "estado": "Hidalgo",
+    "ciudad": "ZM de Pachuca",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.42,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 22.78,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo",
+    "determinantes": "4863, 4919, 5393",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Real Valencia Cancun",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.73,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 21.78,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "5281, 5276, 5271, 5272",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Reynosa Morelos (Adap)",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 2",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 19.6,
+    "margen_proy": 20.72,
+    "margen_estado_proto": 21.52,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.2,
+    "explicacion": "Margen alineado a tiendas comparables proto 2 en CDMX ",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui, Neto, 3B, Neto"
+  },
+  {
+    "nombre": "San Isidro Castillotla",
+    "estado": "Puebla",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.37,
+    "margen_estado_proto": 21.34,
+    "margen_estado": 21.34,
+    "gp_promedio": 22.65,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables con plan activo",
+    "determinantes": "1291, 3376, 2420, 2416, 1913",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Santa Anita Residencial",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.11,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.56,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "6542, 5207, 4751, 2338, 3521, 990",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Señora de los Remedios",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 20.5,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 19.88,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo",
+    "determinantes": "1711, 1277, 1906, 2747, 2295, 3344",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, 3B, Neto"
+  },
+  {
+    "nombre": "Solares Zumpango",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 21.54,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 21.52,
+    "explicacion": "Margen alineado a tiendas comaprables con plan activo",
+    "determinantes": "1771, 5635, 3204, 2477, 2985, 5002, 5033, 6401",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Torreon 2000",
+    "estado": "Coahuila",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villas del Norte",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Monclova-Frontera",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 21.87,
+    "explicacion": "Margen alineado a proto por baja dispersión vs cercanas",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villas Lakin II",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.64,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 22.5,
+    "explicacion": "Margen alineado a tiendas cercanas comparables",
+    "determinantes": "5271, 5282, 1371, 5272, 5281, 6400",
+    "canibalizacion": "1383",
+    "competidor": "Super Willy S"
+  },
+  {
+    "nombre": "2 de abril",
+    "estado": "Puebla",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.64,
+    "margen_estado_proto": 21.34,
+    "margen_estado": 21.34,
+    "gp_promedio": 22.52,
+    "explicacion": "Margen alineado a tiendas cercanas con Plan Próximidad activo",
+    "determinantes": "2547, 5003",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Neto, 3B, Neto"
+  },
+  {
+    "nombre": "Arbolada",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.44,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.01,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables",
+    "determinantes": "3350, 5168, 2404, 2714, 3405",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Camino a la Paz",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.96,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.43,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "3471",
+    "canibalizacion": "3471",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Cordillera La Cima",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.64,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.84,
+    "explicacion": "Margen alineado a tiendas impactadas",
+    "determinantes": "3705, 4931",
+    "canibalizacion": "3705, 4931",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Fuentes Pachuca",
+    "estado": "Hidalgo",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.32,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 22.32,
+    "explicacion": "Margen alineado a tiendas Hidalgo operando -140 Bps por Plan Proximidad",
+    "determinantes": "---",
+    "canibalizacion": "6356",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Hacienda del Sol",
+    "estado": "Tamaulipas",
+    "ciudad": "ZM de Reynosa",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.54,
+    "margen_estado_proto": 21.91,
+    "margen_estado": 21.91,
+    "gp_promedio": 21.52,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables",
+    "determinantes": "4712, 4676, 6429, 210, 6457",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Los Heroes San Pablo",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 21.26,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 21.63,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "2152, 2280, 3572, 1985, 2760, 2728",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Parajes del Valle",
+    "estado": "Baja California",
+    "ciudad": "ZM de Tijuana",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.95,
+    "margen_proy": 23.01,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": 28.2,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "6462, 52",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Puesta del Sol (AA)",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.36,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.63,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables",
+    "determinantes": "4851, 2781, 3958, 5480",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Bodega Sumerca"
+  },
+  {
+    "nombre": "Salamanca Arboledas",
+    "estado": "Guanajuato",
+    "ciudad": "Arboledas [Residencial]",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.24,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 20.99,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables con plan proximidad activo",
+    "determinantes": "5420, 5445",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "San Joaquin Garcia",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.26,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.97,
+    "explicacion": "Margen alineado a tiendas cercanas comaprables",
+    "determinantes": "4933, 3384, 4857, 1994, 1059, 5209",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Santa Maria Lincoln II",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.56,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.85,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "2337",
+    "canibalizacion": "2337",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Unidad Infonavit Oriente",
+    "estado": "Nuevo Leon",
+    "ciudad": "Montemorelos",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 26.15,
+    "explicacion": "Margen alineado a tiendas comaprables",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villa evangelina",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "REP",
+    "mes": "Junio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.32,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 22.18,
+    "explicacion": "Margen alineado a tienda impactada",
+    "determinantes": "4929",
+    "canibalizacion": "4929",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "5 de mayo Sta Barbara",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.05,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.6,
+    "explicacion": "Margen alineado a unidad impactada con plan activo",
+    "determinantes": "3573",
+    "canibalizacion": "3573",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Agrícola Norte ",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.8,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.8,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "2533, 2229, 1949, 2265, 6434, 4846, 3319, 1730, 2832, 2257",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Av Manantial Gto",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de Guanajuato",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 20.91,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "5252",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara, Super Bara"
+  },
+  {
+    "nombre": "Ayuntamiento San Pablo",
+    "estado": "Tlaxcala",
+    "ciudad": "ZM de Tlaxcala-Apizaco",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.0,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto con plan activo -140 bps",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Blvd Heroes del Bicentenario",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de León",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.74,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 20.44,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "5186, 5254",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Blvd Peña Flor Qro",
+    "estado": "Queretaro",
+    "ciudad": "ZM de Querétaro",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.39,
+    "margen_estado_proto": 22.42,
+    "margen_estado": 22.42,
+    "gp_promedio": 22.12,
+    "explicacion": "Margen alineado a unidad impactada con plan activo -140 bps",
+    "determinantes": "2370",
+    "canibalizacion": "2370",
+    "competidor": "3B, Super Bara, Super Bara"
+  },
+  {
+    "nombre": "Calle 181 San Marcos",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": 23.81,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Camino a Santa Ana",
+    "estado": "Tlaxcala",
+    "ciudad": "ZM de Tlaxcala-Apizaco",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.0,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto con plan activo -140 bps",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Cancún Universidad",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.36,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 22.53,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "5271, 1383, 5272, 5281, 5282, 5276, 6399",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Chiautempan Centro",
+    "estado": "Tlaxcala",
+    "ciudad": "ZM de Tlaxcala-Apizaco",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.0,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto con plan activo -140 bps",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui, Neto, 3B"
+  },
+  {
+    "nombre": "Cima Pantitlan",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.36,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.89,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "1949, 3319, 1730",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Zorro"
+  },
+  {
+    "nombre": "Ciudad Caucel 114 Sur",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": 24.98,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "7147",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Coltongo",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.26,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.54,
+    "explicacion": "Margen alineado a unidad impactada con plan activo",
+    "determinantes": "1499",
+    "canibalizacion": "1499",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Conquistadores Gomez Palacio",
+    "estado": "Durango",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Corregidora SLP",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.11,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 22.11,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "3704, 3952, 2484, 5696",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Diagonal Santuario",
+    "estado": "Puebla",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 22.4,
+    "margen_estado_proto": 21.34,
+    "margen_estado": 21.34,
+    "gp_promedio": null,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Enriqueta Caramillo",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.27,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.31,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "2266, 5636, 4662, 2321, 1673, 1641, 2169",
+    "canibalizacion": "7189",
+    "competidor": "Super Precio, Supercito Chedraui, 3B"
+  },
+  {
+    "nombre": "Epatl",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 21.11,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": null,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Faro Iztacalco",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.28,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.63,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "1730, 4019, 2257, 1946, 2533, 4846",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Neto"
+  },
+  {
+    "nombre": "Frac. Los Cedros GP",
+    "estado": "Durango",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Regional"
+  },
+  {
+    "nombre": "Fracc Hacienda de Guadalupe",
+    "estado": "Hidalgo",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 20.32,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 22.38,
+    "explicacion": "Margen alineado a cercana comparable con plan activo -140 bps",
+    "determinantes": "2442, 2443, 4578, 6561",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Super Bara"
+  },
+  {
+    "nombre": "Fracc Santa Fe Qro",
+    "estado": "Queretaro",
+    "ciudad": "ZM de Querétaro",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.68,
+    "margen_estado_proto": 22.42,
+    "margen_estado": 22.42,
+    "gp_promedio": 21.96,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "2010, 3978",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Guadalupana Nezahualcóyotl",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 20.83,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 20.81,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "434, 3104",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Iturbide Minatitlan",
+    "estado": "Veracruz",
+    "ciudad": "Minatitlán",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.93,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado al estado",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "La Higuera Oyamel",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 20.4,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 21.67,
+    "explicacion": "Margen alineado a unidad impactada con plan activo -140 bps",
+    "determinantes": "3258",
+    "canibalizacion": "3258",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Leones Capellania",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 20.91,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.92,
+    "explicacion": "Margen alineado a unidad impactada",
+    "determinantes": "2556",
+    "canibalizacion": "2556",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Megatanque Gomez Palacio ",
+    "estado": "Durango",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Mitierra",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.19,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.42,
+    "explicacion": "Margen alineado a cercana comparable con plan activo -140 bps",
+    "determinantes": "4721, 4843, 3577, 2249, 3949, 5359, 5680, 2791",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Niños Héroes Texcoco",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 19.19,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 20.31,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "1851",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Parque Villa Buenavista",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.14,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.26,
+    "explicacion": "Margen alineado a unidades impactadas",
+    "determinantes": "3164, 499",
+    "canibalizacion": "499, 3164",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Peñón Viejo",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 19.15,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 1004.51,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "1964, 2256, 1946, 2822, 4176, 4699, 2132",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Supercito Chedraui"
+  },
+  {
+    "nombre": "Plaza Loretta",
+    "estado": "Guanajuato",
+    "ciudad": "Irapuato",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 22.3,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": null,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Plaza Shops Cuajimalpa",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 19.82,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.16,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "2183, 1888, 2394, 2804",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Supercito Chedraui, 3B, Neto"
+  },
+  {
+    "nombre": "Porvenir",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Coatzacoalcos",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.79,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": 21.18,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "1484, 2967",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Neto"
+  },
+  {
+    "nombre": "Privadas de Santa Teresa",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.62,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.22,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "1217, 5072, 2403, 4714, 2166, 3385, 2482, 5057",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Privanzas del Parque ",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 21.35,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 21.25,
+    "explicacion": "Margen alineado a unidad impactada con plan activo",
+    "determinantes": "1771",
+    "canibalizacion": "1771",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Puerto Timón",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 20.72,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "6605",
+    "competidor": "Dunosusa"
+  },
+  {
+    "nombre": "Residencial Villalba",
+    "estado": "Queretaro",
+    "ciudad": "ZM de Querétaro",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.46,
+    "margen_estado_proto": 22.42,
+    "margen_estado": 22.42,
+    "gp_promedio": 22.59,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "2368",
+    "canibalizacion": "5127",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Robles Piña",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 20.96,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.88,
+    "explicacion": "Margen alineado a unidad impactada con plan activo -140 bps",
+    "determinantes": "4715",
+    "canibalizacion": "4715",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "San Marcos Sustentable",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.49,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": 23.81,
+    "explicacion": "Margen alineado a unidad impactada",
+    "determinantes": "5286",
+    "canibalizacion": "5286",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "San Pablo Tlalli",
+    "estado": "Tlaxcala",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.0,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": 21.49,
+    "explicacion": "Margen alineado a proto con plan activo -140 bps",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, 3B"
+  },
+  {
+    "nombre": "Sayago y Azcarate",
+    "estado": "Veracruz",
+    "ciudad": "Veracruz (ZM)",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.93,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado al estado",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Torres de Culhuacan",
+    "estado": "Distrito Federal",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 18.35,
+    "margen_proy": 20.35,
+    "margen_estado_proto": 20.25,
+    "margen_estado": 20.36,
+    "gp_promedio": 20.73,
+    "explicacion": "Margen alineado a cercana comparable con plan activo",
+    "determinantes": "2277, 2287, 3573, 1996",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Valle de los Cedros",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 21.14,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 21.25,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "5285, 2477, 5635, 3204, 5033, 1771, 6401",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Valle del Seminario",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.95,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.78,
+    "explicacion": "Margen alineado a unidad impactada",
+    "determinantes": "3457",
+    "canibalizacion": "3457",
+    "competidor": "Bodega Sumerca"
+  },
+  {
+    "nombre": "Valmoral",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.79,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.72,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "2915",
+    "canibalizacion": "2563",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Ventura Monclova",
+    "estado": "Coahuila",
+    "ciudad": "ZM de Monclova-Frontera",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.02,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": 21.87,
+    "explicacion": "Margen alineado a cercanas comparables",
+    "determinantes": "5425, 5447, 872, 921, 897, 6559, 6378",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villa Anzures",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Julio 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.35,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.53,
+    "explicacion": "Margen alineado a unidades impactadas",
+    "determinantes": "1447, 3405, 4798",
+    "canibalizacion": "1447, 3405, 4798",
+    "competidor": "Sin competencia"
+  }
+];
+
+// ── Estado de filtros ──────────────────────────────────────────────────────
+const MESES_INFO  = [{"mes": "Enero 2026", "nombre": "Enero", "total": 8, "new_c": 0, "rep_c": 8, "badge": "badge-ene", "emoji": "❄️", "sid": "enero-2026", "css": "background:#e0f2fe;color:#0369a1"}, {"mes": "Febrero 2026", "nombre": "Febrero", "total": 26, "new_c": 19, "rep_c": 7, "badge": "badge-feb", "emoji": "💜", "sid": "febrero-2026", "css": "background:#f5f3ff;color:#7c3aed"}, {"mes": "Marzo 2026", "nombre": "Marzo", "total": 18, "new_c": 10, "rep_c": 8, "badge": "badge-mar", "emoji": "🌿", "sid": "marzo-2026", "css": "background:#dcfce7;color:#166534"}, {"mes": "Abril 2026", "nombre": "Abril", "total": 24, "new_c": 16, "rep_c": 8, "badge": "badge-abr", "emoji": "🌸", "sid": "abril-2026", "css": "background:#fdf2f8;color:#db2777"}, {"mes": "Mayo 2026", "nombre": "Mayo", "total": 19, "new_c": 12, "rep_c": 7, "badge": "badge-mayo", "emoji": "🟣", "sid": "mayo-2026", "css": "background:#ede9fe;color:#6d28d9"}, {"mes": "Junio 2026", "nombre": "Junio", "total": 50, "new_c": 36, "rep_c": 14, "badge": "badge-junio", "emoji": "🔵", "sid": "junio-2026", "css": "background:#dbeafe;color:#0053e2"}, {"mes": "Julio 2026", "nombre": "Julio", "total": 48, "new_c": 48, "rep_c": 0, "badge": "badge-jul", "emoji": "🟠", "sid": "julio-2026", "css": "background:#ffedd5;color:#ea580c"}];
+const ACTIVE_MESES = new Set();  // vacío = todos
+const SEL = { nombre: new Set(), estado: new Set(), tipo: new Set(), proto: new Set(), proximidad: new Set(), operador: new Set() };
+
+// ── Operador → estados ──────────────────────────────────────────────────────────
+const OP_MAP = {
+  ernesto: ['baja california','chihuahua','coahuila','durango','guanajuato','michoacan','nuevo leon','san luis potosi','sinaloa','sonora','tamaulipas','zacatecas'],
+  karla:   ['campeche','chiapas','distrito federal','mexico','oaxaca','quintana roo','tabasco','yucatan'],
+  luisa:   ['aguascalientes','colima','guerrero','hidalgo','jalisco','morelos','nayarit','puebla','queretaro','tlaxcala','veracruz'],
+};
+function getOpKey(tr) {
+  const edo = norm(tr.cells[4]?.textContent.trim()||'');
+  for (const [op, estados] of Object.entries(OP_MAP)) {
+    if (estados.some(e => edo.includes(norm(e)))) return op;
+  }
+  return '';
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function norm(s) { return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function pctStr(v) { return v == null ? 'N/A' : v.toFixed(2)+'%'; }
+function numVal(s) { const v = parseFloat((s||'').replace('%','')); return isNaN(v) ? null : v; }
+
+function mesBadge(mes) {
+  const info = MESES_INFO.find(m => m.mes === mes);
+  if (info) return '<span class="badge '+info.badge+'">'+mes.split(' ')[0]+'</span>';
+  return '<span class="badge badge-gray">'+mes+'</span>';
+}
+function tipoBadge(tipo) {
+  if (tipo === 'REP') return '<span class="badge badge-purple">REP</span>';
+  return '<span class="badge badge-blue">New</span>';
+}
+function proxBadge(val) {
+  if (val === 'Proximidad') return '<span class="badge badge-green">📍 Proximidad</span>';
+  return '<span class="badge badge-gray">No Proximidad</span>';
+}
+function statusBadge(proto, proy) {
+  if (proto == null || proy == null) return '<span class="badge badge-gray">N/A</span>';
+  if (proy >= proto) return '<span class="badge badge-green">✓ Sobre proto</span>';
+  const diff = (proy - proto).toFixed(2);
+  return '<span class="badge badge-amber">↓ '+diff+'%</span>';
+}
+
+// ── Render tabla ──────────────────────────────────────────────────────────────
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  let html = '';
+  data.forEach((r, i) => {
+    const bg  = i % 2 === 0 ? '' : 'row-alt';
+    const mEdoProto = r.margen_estado_proto != null ? r.margen_estado_proto.toFixed(2)+'%' : '—';
+    const mEdo = r.margen_estado != null ? r.margen_estado.toFixed(2)+'%' : '—';
+    const gp   = r.gp_promedio  != null ? r.gp_promedio.toFixed(2)+'%'  : '—';
+    html += `<tr class="${bg}" data-mes="${r.mes}" data-tipo="${r.tipo}" data-proximidad="${r.proximidad}">
+      <td class="td-center">${mesBadge(r.mes)}</td>
+      <td class="td-center">${tipoBadge(r.tipo)}</td>
+      <td class="td-nombre">${r.nombre}</td>
+      <td class="td-long">${r.proto}</td>
+      <td>${r.estado}</td>
+      <td>${r.ciudad}</td>
+      <td class="td-num">${pctStr(r.margen_proto)}</td>
+      <td class="td-num">${pctStr(r.margen_proy)}</td>
+      <td class="td-center">${statusBadge(r.margen_proto, r.margen_proy)}</td>
+      <td class="td-num">${mEdoProto}</td>
+      <td class="td-num">${mEdo}</td>
+      <td class="td-num">${gp}</td>
+      <td class="td-long">${r.explicacion}</td>
+      <td class="td-long">${r.determinantes}</td>
+      <td class="td-long">${r.canibalizacion}</td>
+      <td class="td-long">${r.competidor}</td>
+      <td class="td-center">${proxBadge(r.proximidad)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+  FILAS = Array.from(tbody.querySelectorAll('tr'));
+  initDropdowns();
+  filtrarTabla();
+}
+
+let FILAS = [];
+
+// ── Dropdowns multi-select ─────────────────────────────────────────────────────
+function rowVal(tr, key) {
+  if (key === 'nombre')     return (tr.cells[2]?.textContent.trim()||'').toLowerCase();
+  if (key === 'estado')     return  tr.cells[4]?.textContent.trim()||'';
+  if (key === 'tipo')       return  tr.dataset.tipo||'';
+  if (key === 'proto')      return (tr.cells[3]?.textContent.trim()||'').toLowerCase();
+  if (key === 'proximidad') return  tr.dataset.proximidad||'';
+  if (key === 'operador')   return  getOpKey(tr);
+  return '';
+}
+
+function rowMatches(tr, skipKey) {
+  // mes pill
+  if (ACTIVE_MESES.size > 0 && !ACTIVE_MESES.has(tr.dataset.mes)) return false;
+  // multi-select
+  for (const key of Object.keys(SEL)) {
+    if (key === skipKey || SEL[key].size === 0) continue;
+    if (!SEL[key].has(rowVal(tr, key))) return false;
+  }
+  return true;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.msel')) document.querySelectorAll('.msel-panel.open').forEach(p => p.classList.remove('open'));
+});
+
+function toggleDD(id) {
+  const panel = document.getElementById(id+'-panel');
+  const wasOpen = panel.classList.contains('open');
+  document.querySelectorAll('.msel-panel.open').forEach(p => p.classList.remove('open'));
+  if (!wasOpen) panel.classList.add('open');
+}
+
+function buildOpt(val, label, key) {
+  const div = document.createElement('div');
+  div.className = 'msel-opt'; div.dataset.val = val;
+  const cb = document.createElement('input'); cb.type = 'checkbox';
+  cb.id = 'cb-'+key+'-'+val.replace(/[^a-zA-Z0-9]/g,'_');
+  cb.addEventListener('change', () => { if (cb.checked) SEL[key].add(val); else SEL[key].delete(val); filtrarTabla(); });
+  const lbl = document.createElement('label'); lbl.htmlFor = cb.id; lbl.textContent = label;
+  div.appendChild(cb); div.appendChild(lbl);
+  return div;
+}
+
+function initDropdowns() {
+  const byKey = {
+    nombre   : [...new Set(FILAS.map(tr => tr.cells[2]?.textContent.trim()||'').filter(Boolean))].sort().map(n => ({val:n.toLowerCase(), label:n})),
+    estado   : [...new Set(FILAS.map(tr => tr.cells[4]?.textContent.trim()||'').filter(Boolean))].sort().map(e => ({val:e, label:e})),
+    tipo     : [{val:'New',label:'New'},{val:'REP',label:'REP'}],
+    proto    : [...new Set(FILAS.map(tr => tr.cells[3]?.textContent.trim()||'').filter(Boolean))].sort().map(p => ({val:p.toLowerCase(), label:p})),
+    proximidad: [{val:'Proximidad',label:'Proximidad'},{val:'No Proximidad',label:'No Proximidad'}],
+    operador : [
+      {val:'ernesto', label:'Ernesto Barajas Terán'},
+      {val:'karla',   label:'Karla Jiménez Gutiérrez'},
+      {val:'luisa',   label:'Luisa Fernanda Reina'},
+    ],
+  };
+  for (const [key, entries] of Object.entries(byKey)) {
+    const c = document.getElementById('dd-'+key+'-opts');
+    if (c) { c.innerHTML=''; entries.forEach(e => c.appendChild(buildOpt(e.val, e.label, key))); }
+  }
+}
+
+// Reconstruye opciones de nombre/estado/proto segun mes activo
+function rebuildMesDropdowns() {
+  const mesRows = ACTIVE_MESES.size === 0
+    ? FILAS
+    : FILAS.filter(tr => ACTIVE_MESES.has(tr.dataset.mes));
+
+  const byKey = {
+    nombre: [...new Set(mesRows.map(tr => tr.cells[2]?.textContent.trim()||'').filter(Boolean))].sort()
+              .map(n => ({val: n.toLowerCase(), label: n})),
+    estado: [...new Set(mesRows.map(tr => tr.cells[4]?.textContent.trim()||'').filter(Boolean))].sort()
+              .map(e => ({val: e, label: e})),
+    proto:  [...new Set(mesRows.map(tr => tr.cells[3]?.textContent.trim()||'').filter(Boolean))].sort()
+              .map(p => ({val: p.toLowerCase(), label: p})),
+  };
+
+  for (const [key, entries] of Object.entries(byKey)) {
+    const c = document.getElementById('dd-'+key+'-opts');
+    if (!c) continue;
+    const validVals = new Set(entries.map(e => e.val));
+    for (const sel of [...SEL[key]]) {
+      if (!validVals.has(sel)) SEL[key].delete(sel);
+    }
+    c.innerHTML = '';
+    entries.forEach(e => c.appendChild(buildOpt(e.val, e.label, key)));
+  }
+}
+
+function filterDDSearch(input, ddId) {
+  const q = norm(input.value);
+  document.querySelectorAll('#'+ddId+'-opts .msel-opt').forEach(opt => {
+    opt.style.display = norm(opt.querySelector('label').textContent).includes(q) ? '' : 'none';
+  });
+}
+
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+function actualizarKPIs(visibles) {
+  const total = visibles.length;
+  let sumProy=0, cntProy=0, sumProto=0, cntProto=0, sobreProto=0;
+  let cntNew=0, cntRep=0;
+  visibles.forEach(tr => {
+    const proto = numVal(tr.cells[6]?.textContent);
+    const proy  = numVal(tr.cells[7]?.textContent);
+    if (proy  != null) { sumProy  += proy;  cntProy++;  }
+    if (proto != null) { sumProto += proto; cntProto++; }
+    if (proto != null && proy != null && proy >= proto) sobreProto++;
+    if (tr.dataset.tipo === 'New') cntNew++; else cntRep++;
+  });
+  const avgProy  = cntProy  ? sumProy/cntProy   : null;
+  const avgProto = cntProto ? sumProto/cntProto : null;
+  const delta    = avgProy != null && avgProto != null ? avgProy - avgProto : null;
+
+  const mesLabel = ACTIVE_MESES.size === 0
+    ? MESES_INFO.map(m => m.mes).join(' · ')
+    : [...ACTIVE_MESES].join(' · ');
+  document.getElementById('kpiHeader').textContent = mesLabel + ' · ' + total + ' proyecto' + (total!==1?'s':'');
+  document.getElementById('kpiTotal').textContent  = total;
+  const detalle = `${cntNew} New · ${cntRep} REP`;
+  document.getElementById('kpiTotalDetalle').textContent = detalle;
+  document.getElementById('kpiAvgProto').textContent  = avgProto != null ? avgProto.toFixed(2)+'%' : '—';
+  document.getElementById('kpiAvg').textContent        = avgProy  != null ? avgProy.toFixed(2)+'%'  : '—';
+  document.getElementById('kpiAvg').style.color = (avgProy != null && avgProto != null && avgProy >= avgProto) ? '#2a8703' : '#995213';
+  document.getElementById('kpiMayor').textContent      = total > 0 ? sobreProto+'/'+total : '—';
+  document.getElementById('kpiMayor').style.color      = (total > 0 && sobreProto === total) ? '#2a8703' : '#995213';
+  const solo = total === 1;
+  document.getElementById('kpiAvgProtoLbl').textContent = solo ? 'Margen Proto'    : 'Margen Proto Prom.';
+  document.getElementById('kpiAvgLbl').textContent      = solo ? 'Margen Proyecto' : 'Margen Proyecto Prom.';
+
+  const el = document.getElementById('contadorFilas');
+  el.textContent = total === FILAS.length ? `${total} proyectos` : `${total} de ${FILAS.length} proyectos`;
+}
+
+// ── Filtrar tabla ─────────────────────────────────────────────────────────────
+function filtrarTabla() {
+  const visibles = [];
+  FILAS.forEach(tr => {
+    const ok = rowMatches(tr, null);
+    tr.style.display = ok ? '' : 'none';
+    if (ok) visibles.push(tr);
+  });
+  // Actualizar disponibilidad de opciones en dropdowns
+  for (const key of Object.keys(SEL)) {
+    const cands = FILAS.filter(tr => rowMatches(tr, key));
+    const disp  = new Set(cands.map(tr => rowVal(tr, key)));
+    document.querySelectorAll('#dd-'+key+'-opts .msel-opt').forEach(opt => {
+      const avail = disp.has(opt.dataset.val);
+      opt.classList.toggle('unavail', !avail);
+      const cb = opt.querySelector('input');
+      if (cb) { cb.disabled = !avail && !cb.checked; }
+    });
+    const cnt = SEL[key].size;
+    const el  = document.getElementById('dd-'+key+'-count');
+    if (el) { el.textContent = cnt||''; el.classList.toggle('active', cnt>0); }
+  }
+  actualizarKPIs(visibles);
+  // Re-zebra stripes
+  let alt = 0;
+  FILAS.forEach(tr => {
+    if (tr.style.display !== 'none') {
+      tr.classList.toggle('row-alt', alt%2===1);
+      alt++;
+    }
+  });
+}
+
+// ── Pills de mes (multi-select) ──────────────────────────────────────────────────────────
+function mesDetalleSync() {
+  const todos = ACTIVE_MESES.size === 0;
+  MESES_INFO.forEach(m => {
+    const det  = document.getElementById('det-' + m.sid);
+    const pill = document.getElementById('pill-' + m.sid);
+    if (det)  det.style.display = (todos || ACTIVE_MESES.has(m.mes)) ? '' : 'none';
+    if (pill) pill.classList.toggle('active', ACTIVE_MESES.has(m.mes));
+  });
+  document.getElementById('pill-todos').classList.toggle('active', todos);
+  const label = todos
+    ? MESES_INFO.map(m => m.mes).join(' · ')
+    : [...ACTIVE_MESES].join(' · ');
+  document.getElementById('headerMesBadge').textContent = label;
+}
+
+function selectTodos() {
+  ACTIVE_MESES.clear();
+  mesDetalleSync();
+  rebuildMesDropdowns();
+  filtrarTabla();
+}
+
+function toggleMes(mes) {
+  if (ACTIVE_MESES.has(mes)) { ACTIVE_MESES.delete(mes); }
+  else                       { ACTIVE_MESES.add(mes);    }
+  if (ACTIVE_MESES.size === 0) { selectTodos(); return; }
+  mesDetalleSync();
+  rebuildMesDropdowns();
+  filtrarTabla();
+}
+
+function limpiarFiltros() {
+  for (const key of Object.keys(SEL)) SEL[key].clear();
+  document.querySelectorAll('.msel-opt input[type=checkbox]').forEach(cb => { cb.checked=false; cb.disabled=false; });
+  document.querySelectorAll('.msel-opt').forEach(opt => opt.classList.remove('unavail'));
+  document.querySelectorAll('.msel-count').forEach(el => { el.textContent=''; el.classList.remove('active'); });
+  filtrarTabla();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderTable(ALL_DATA);
+</script>
+</body>
+</html>
