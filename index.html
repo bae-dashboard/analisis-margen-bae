@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- WALTON-BUILD: 2026-07-31 11:09:16 | Ene:0N+8R | Feb:19N+7R | Mar:10N+8R | Abr:16N+8R | May:12N+7R | Jun:36N+14R | Jul:17N+5R | Total=167 -->
+<!-- WALTON-BUILD: 2026-08-02 19:44:56 | Ene:0N+8R | Feb:19N+7R | Mar:10N+8R | Abr:16N+8R | May:12N+7R | Jun:36N+14R | Jul:17N+5R | Ago:26N+0R | Total=193 -->
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Análisis Margen</title>
@@ -91,7 +91,7 @@
   <div>
     <div class="text-xs font-semibold tracking-widest opacity-70 mb-1">FINANZAS REAL ESTATE</div>
     <h1 class="text-2xl font-bold">Análisis Margen</h1>
-    <div class="text-sm opacity-80 mt-1" id="kpiHeader">Mayo · Junio 2026 · 167 proyectos</div>
+    <div class="text-sm opacity-80 mt-1" id="kpiHeader">Mayo · Junio 2026 · 193 proyectos</div>
   </div>
   <div class="text-right">
     <div style="background:#FFC220" class="text-gray-900 font-bold px-4 py-1 rounded-lg text-sm" id="headerMesBadge">Mayo · Junio 2026</div>
@@ -111,6 +111,7 @@
       <div class="pill" id="pill-mayo-2026" onclick="toggleMes('Mayo 2026')">Mayo</div>
       <div class="pill" id="pill-junio-2026" onclick="toggleMes('Junio 2026')">Junio</div>
       <div class="pill" id="pill-julio-2026" onclick="toggleMes('Julio 2026')">Julio</div>
+      <div class="pill" id="pill-agosto-2026" onclick="toggleMes('Agosto 2026')">Agosto</div>
     </div>
   </div>
 </div>
@@ -126,15 +127,16 @@
     <span class="text-xs text-gray-600" id="det-mayo-2026"><span class="badge badge-mayo">Mayo</span> <span class="font-semibold ml-1">19 proy.</span> <span class="text-gray-400 ml-1">12 New &nbsp;&middot;&nbsp; 7 REP</span></span>
     <span class="text-xs text-gray-600" id="det-junio-2026"><span class="badge badge-junio">Junio</span> <span class="font-semibold ml-1">50 proy.</span> <span class="text-gray-400 ml-1">36 New &nbsp;&middot;&nbsp; 14 REP</span></span>
     <span class="text-xs text-gray-600" id="det-julio-2026"><span class="badge badge-jul">Julio</span> <span class="font-semibold ml-1">22 proy.</span> <span class="text-gray-400 ml-1">17 New &nbsp;&middot;&nbsp; 5 REP</span></span>
+    <span class="text-xs text-gray-600" id="det-agosto-2026"><span class="badge badge-ago">Agosto</span> <span class="font-semibold ml-1">26 proy.</span> <span class="text-gray-400 ml-1">26 New &nbsp;&middot;&nbsp; 0 REP</span></span>
   </div>
 </div>
 
 <!-- KPI Cards -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
   <div class="kpi-card" style="border-left:4px solid #FFC220">
-    <div class="kpi-val text-blue-700" id="kpiTotal">167</div>
+    <div class="kpi-val text-blue-700" id="kpiTotal">193</div>
     <div class="kpi-lbl">Total Proyectos</div>
-    <div class="text-xs text-gray-400 mt-1" id="kpiTotalDetalle">Enero: 8 (0 New · 8 REP) · Febrero: 26 (19 New · 7 REP) · Marzo: 18 (10 New · 8 REP) · Abril: 24 (16 New · 8 REP) · Mayo: 19 (12 New · 7 REP) · Junio: 50 (36 New · 14 REP) · Julio: 22 (17 New · 5 REP)</div>
+    <div class="text-xs text-gray-400 mt-1" id="kpiTotalDetalle">Enero: 8 (0 New · 8 REP) · Febrero: 26 (19 New · 7 REP) · Marzo: 18 (10 New · 8 REP) · Abril: 24 (16 New · 8 REP) · Mayo: 19 (12 New · 7 REP) · Junio: 50 (36 New · 14 REP) · Julio: 22 (17 New · 5 REP) · Agosto: 26 (26 New · 0 REP)</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-val" id="kpiAvgProto">—</div>
@@ -3301,11 +3303,479 @@ const ALL_DATA = [
     "determinantes": "2254, 5278",
     "canibalizacion": "Sin canibalizacion",
     "competidor": "Dunosusa"
+  },
+  {
+    "nombre": "Antonio Carvajal",
+    "estado": "Tlaxcala",
+    "ciudad": "ZM de Tlaxcala-Apizaco",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.2,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto con plan  proximidad activo ",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Av. del Tropico",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.63,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 21.03,
+    "explicacion": "Margen alineado a unidad impactada",
+    "determinantes": "3165",
+    "canibalizacion": "3165",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Azteca Chimalhuacan",
+    "estado": "Mexico",
+    "ciudad": "ZM del Valle de México",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.11,
+    "margen_proy": 19.04,
+    "margen_estado_proto": 20.6,
+    "margen_estado": 20.63,
+    "gp_promedio": 19.67,
+    "explicacion": "Margen alineado a unidad impactada con plan proximidad",
+    "determinantes": "1362",
+    "canibalizacion": "1362",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Calle 77 Mulchechen",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": null,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Camino a San Roque",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.36,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 22.17,
+    "explicacion": "Margen alineado a unidad impactada",
+    "determinantes": "4844",
+    "canibalizacion": "4844",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Damián Carmona SLP",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 20.38,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 20.93,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "2610, 3985, 3702, 3706",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Municipal Market, 3B"
+  },
+  {
+    "nombre": "Fracc Basalto Pachuca",
+    "estado": "Hidalgo",
+    "ciudad": "ZM de Pachuca",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 22.78,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 22.48,
+    "explicacion": "Margen alineado a unidad impactada con plan proximidad",
+    "determinantes": "5269",
+    "canibalizacion": "5269",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Hacienda Real a Saltillo",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 20.23,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 20.94,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "3706, 53, 3700",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Huerta del Lago",
+    "estado": "Jalisco",
+    "ciudad": "Lagos de Moreno",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.07,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 21.9,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "5422, 5446",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, Super Bara"
+  },
+  {
+    "nombre": "Kanasin Calle 59",
+    "estado": "Yucatan",
+    "ciudad": "ZM de Mérida",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 22.75,
+    "margen_estado_proto": 22.78,
+    "margen_estado": 22.66,
+    "gp_promedio": null,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "La Constancia Torreón",
+    "estado": "Coahuila",
+    "ciudad": "ZM de La Laguna",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 22.07,
+    "margen_estado_proto": 21.87,
+    "margen_estado": 21.87,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Las Juntas Vallarta",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Puerto Vallarta",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.07,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "3333, 3417, 2437, 5436",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Las Pintas Zapata",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.48,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.53,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "2439, 3972, 2514, 3120, 5679",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Leones Capellania",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.53,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.93,
+    "explicacion": "Margen alineado a unidad impactada",
+    "determinantes": "5406, 4773, 2311",
+    "canibalizacion": "2556",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Magisterio",
+    "estado": "Hidalgo",
+    "ciudad": "ZM de Pachuca",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.7,
+    "margen_estado_proto": 22.38,
+    "margen_estado": 22.38,
+    "gp_promedio": 22.42,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "5617, 4919, 5393, 5269, 2571",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Miterra",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.39,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.42,
+    "explicacion": "Margen alineado a cercana comparable con plan activo -140 bps",
+    "determinantes": "4721, 4843, 3577, 2249, 3949, 5359, 5680, 2791",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Super Bara"
+  },
+  {
+    "nombre": "Plaza Loretta",
+    "estado": "Guanajuato",
+    "ciudad": "ZM de Celaya",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 21.22,
+    "margen_estado_proto": 20.46,
+    "margen_estado": 20.46,
+    "gp_promedio": 21.45,
+    "explicacion": "Margen alineado a cercanas comparables con plan activo",
+    "determinantes": "1895, 1739",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Plaza Villa del Alamo",
+    "estado": "Baja California",
+    "ciudad": "ZM de Tijuana",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 21.95,
+    "margen_proy": 23.63,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": 25.42,
+    "explicacion": "Margen alineado a cercana comparable",
+    "determinantes": "52",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Puerto Timón",
+    "estado": "Quintana Roo",
+    "ciudad": "ZM de Cancún",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.75,
+    "margen_proy": 21.82,
+    "margen_estado_proto": 21.45,
+    "margen_estado": 21.45,
+    "gp_promedio": 20.68,
+    "explicacion": "Margen alineado a proto",
+    "determinantes": "5276, 5364, 5281, 5307",
+    "canibalizacion": "6605",
+    "competidor": "Dunosusa"
+  },
+  {
+    "nombre": "Robles Piña",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Guadalajara",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.31,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 22.84,
+    "explicacion": "Margen alineado a unidad impactada con plan activo",
+    "determinantes": "4715",
+    "canibalizacion": "4715",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "San Pablo Tlalli",
+    "estado": "Tlaxcala",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 21.2,
+    "margen_estado_proto": null,
+    "margen_estado": null,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto con plan activo -140 bps",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B, 3B"
+  },
+  {
+    "nombre": "Soledad de Graciano Norte",
+    "estado": "San Luis Potosi",
+    "ciudad": "ZM de San Luis Potosí",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 22.3,
+    "margen_proy": 20.3,
+    "margen_estado_proto": 21.58,
+    "margen_estado": 21.58,
+    "gp_promedio": 21.22,
+    "explicacion": "Margen alineado a cercanas comparables con plan proximidad",
+    "determinantes": "2484, 1263, 5696, 2610",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Tabachin Ocotlan",
+    "estado": "Jalisco",
+    "ciudad": "ZM de Ocotlán",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "Proximidad",
+    "margen_proto": 21.0,
+    "margen_proy": 21.27,
+    "margen_estado_proto": 22.29,
+    "margen_estado": 22.32,
+    "gp_promedio": 24.92,
+    "explicacion": "Margen alineado al estado",
+    "determinantes": "2216, 2564, 4715, 1393, 5368, 4842",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "3B"
+  },
+  {
+    "nombre": "Tres Cerritos Puebla",
+    "estado": "Puebla",
+    "ciudad": "ZM de Puebla-Tlaxcala",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.4,
+    "margen_proy": 22.4,
+    "margen_estado_proto": 21.34,
+    "margen_estado": 21.34,
+    "gp_promedio": null,
+    "explicacion": "N/A",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villa Allende",
+    "estado": "Veracruz",
+    "ciudad": "ZM de Veracruz",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 20.5,
+    "margen_proy": 20.5,
+    "margen_estado_proto": 20.92,
+    "margen_estado": 20.92,
+    "gp_promedio": null,
+    "explicacion": "Margen alineado a proto con plan proximidad",
+    "determinantes": "---",
+    "canibalizacion": "Sin canibalizacion",
+    "competidor": "Sin competencia"
+  },
+  {
+    "nombre": "Villa Anzures",
+    "estado": "Nuevo Leon",
+    "ciudad": "ZM de Monterrey",
+    "proto": "BAE 3",
+    "tipo": "New",
+    "mes": "Agosto 2026",
+    "proximidad": "No Proximidad",
+    "margen_proto": 22.07,
+    "margen_proy": 21.75,
+    "margen_estado_proto": 21.3,
+    "margen_estado": 21.32,
+    "gp_promedio": 20.46,
+    "explicacion": "Margen alineado a unidades impactadas",
+    "determinantes": "3405, 4798, 5211",
+    "canibalizacion": "1447, 3405",
+    "competidor": "Sin competencia"
   }
 ];
 
 // ── Estado de filtros ──────────────────────────────────────────────────────
-const MESES_INFO  = [{"mes": "Enero 2026", "nombre": "Enero", "total": 8, "new_c": 0, "rep_c": 8, "badge": "badge-ene", "emoji": "❄️", "sid": "enero-2026", "css": "background:#e0f2fe;color:#0369a1"}, {"mes": "Febrero 2026", "nombre": "Febrero", "total": 26, "new_c": 19, "rep_c": 7, "badge": "badge-feb", "emoji": "💜", "sid": "febrero-2026", "css": "background:#f5f3ff;color:#7c3aed"}, {"mes": "Marzo 2026", "nombre": "Marzo", "total": 18, "new_c": 10, "rep_c": 8, "badge": "badge-mar", "emoji": "🌿", "sid": "marzo-2026", "css": "background:#dcfce7;color:#166534"}, {"mes": "Abril 2026", "nombre": "Abril", "total": 24, "new_c": 16, "rep_c": 8, "badge": "badge-abr", "emoji": "🌸", "sid": "abril-2026", "css": "background:#fdf2f8;color:#db2777"}, {"mes": "Mayo 2026", "nombre": "Mayo", "total": 19, "new_c": 12, "rep_c": 7, "badge": "badge-mayo", "emoji": "🟣", "sid": "mayo-2026", "css": "background:#ede9fe;color:#6d28d9"}, {"mes": "Junio 2026", "nombre": "Junio", "total": 50, "new_c": 36, "rep_c": 14, "badge": "badge-junio", "emoji": "🔵", "sid": "junio-2026", "css": "background:#dbeafe;color:#0053e2"}, {"mes": "Julio 2026", "nombre": "Julio", "total": 22, "new_c": 17, "rep_c": 5, "badge": "badge-jul", "emoji": "🟠", "sid": "julio-2026", "css": "background:#ffedd5;color:#ea580c"}];
+const MESES_INFO  = [{"mes": "Enero 2026", "nombre": "Enero", "total": 8, "new_c": 0, "rep_c": 8, "badge": "badge-ene", "emoji": "❄️", "sid": "enero-2026", "css": "background:#e0f2fe;color:#0369a1"}, {"mes": "Febrero 2026", "nombre": "Febrero", "total": 26, "new_c": 19, "rep_c": 7, "badge": "badge-feb", "emoji": "💜", "sid": "febrero-2026", "css": "background:#f5f3ff;color:#7c3aed"}, {"mes": "Marzo 2026", "nombre": "Marzo", "total": 18, "new_c": 10, "rep_c": 8, "badge": "badge-mar", "emoji": "🌿", "sid": "marzo-2026", "css": "background:#dcfce7;color:#166534"}, {"mes": "Abril 2026", "nombre": "Abril", "total": 24, "new_c": 16, "rep_c": 8, "badge": "badge-abr", "emoji": "🌸", "sid": "abril-2026", "css": "background:#fdf2f8;color:#db2777"}, {"mes": "Mayo 2026", "nombre": "Mayo", "total": 19, "new_c": 12, "rep_c": 7, "badge": "badge-mayo", "emoji": "🟣", "sid": "mayo-2026", "css": "background:#ede9fe;color:#6d28d9"}, {"mes": "Junio 2026", "nombre": "Junio", "total": 50, "new_c": 36, "rep_c": 14, "badge": "badge-junio", "emoji": "🔵", "sid": "junio-2026", "css": "background:#dbeafe;color:#0053e2"}, {"mes": "Julio 2026", "nombre": "Julio", "total": 22, "new_c": 17, "rep_c": 5, "badge": "badge-jul", "emoji": "🟠", "sid": "julio-2026", "css": "background:#ffedd5;color:#ea580c"}, {"mes": "Agosto 2026", "nombre": "Agosto", "total": 26, "new_c": 26, "rep_c": 0, "badge": "badge-ago", "emoji": "🔴", "sid": "agosto-2026", "css": "background:#fef2f2;color:#dc2626"}];
 const ACTIVE_MESES = new Set();  // vacío = todos
 const SEL = { nombre: new Set(), estado: new Set(), tipo: new Set(), proto: new Set(), proximidad: new Set(), operador: new Set() };
 
