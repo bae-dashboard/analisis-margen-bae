@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<!-- WALTON-BUILD: 2026-10-08 14:53:56 | Ene:0N+8R | Feb:19N+7R | Mar:10N+8R | Abr:16N+8R | May:12N+7R | Jun:36N+14R | Jul:14N+5R | Ago:12N+6R | Sep:22N+6R | Oct:27N+7R | Total=244 -->
+<!-- WALTON-BUILD: 2026-10-09 13:19:31 | Ene:0N+8R | Feb:19N+7R | Mar:10N+8R | Abr:16N+8R | May:12N+7R | Jun:36N+14R | Jul:14N+5R | Ago:12N+6R | Sep:22N+6R | Oct:27N+7R | Total=244 -->
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Análisis Margen</title>
@@ -9,26 +9,27 @@
 <style>
   body { font-family: Calibri, 'Segoe UI', sans-serif; background:#f5f7fa; color:#1A1A1A; }
   .kpi-card { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:1.25rem 1.5rem; }
-  .kpi-card-featured { background:#f0f4ff; border-left:4px solid #0053E2; border-radius:12px; box-shadow:0 4px 14px rgba(0,83,226,.12); padding:1.25rem 1.5rem; }
-  .kpi-card-featured .kpi-val { color:#0053E2; }
+  .kpi-card-featured { background:#eafaf1; border-left:4px solid #00A651; border-radius:12px; box-shadow:0 4px 14px rgba(0,166,81,.12); padding:1.25rem 1.5rem; }
+  .kpi-card-featured .kpi-val { color:#00A651; }
   .kpi-card-featured .kpi-lbl { color:#374151; }
-  .kpi-val  { font-size:2rem; font-weight:700; color:#0053E2; }
+  .kpi-val  { font-size:2rem; font-weight:700; color:#00A651; }
   .kpi-lbl  { font-size:.8rem; color:#555; text-transform:uppercase; letter-spacing:.05em; margin-top:.15rem; }
   .section  { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:1.5rem; margin-bottom:1.5rem; }
-  .section-title { font-size:1.05rem; font-weight:700; color:#0053E2; margin-bottom:1rem; border-bottom:2px solid #FFC220; padding-bottom:.4rem; }
+  .section-title { font-size:1.05rem; font-weight:700; color:#00A651; margin-bottom:1rem; border-bottom:2px solid #FFC220; padding-bottom:.4rem; }
   table { width:100%; border-collapse:collapse; font-size:.78rem; }
-  th { background:#0053E2; color:white; padding:.55rem .6rem; text-align:left; font-weight:600; white-space:nowrap; position:sticky; top:0; z-index:10; }
+  th { background:#00A651; color:white; padding:.55rem .6rem; text-align:left; font-weight:600; white-space:nowrap; position:sticky; top:0; z-index:10; }
   td { padding:.5rem .6rem; vertical-align:top; border-bottom:1px solid #e5e7eb; }
-  .row-alt { background:#f8faff; }
+  .row-alt { background:#f6fdf9; }
   .td-nombre { font-weight:600; min-width:160px; }
   .td-num    { text-align:center; white-space:nowrap; }
   .td-center { text-align:center; }
   .td-long   { min-width:140px; max-width:220px; word-break:break-word; }
+  .td-proto  { min-width:0; max-width:100px; width:1%; white-space:nowrap; padding-right:.4rem; }
   .badge { display:inline-block; padding:.2rem .55rem; border-radius:999px; font-size:.72rem; font-weight:600; }
   .badge-green  { background:#d1fae5; color:#2a8703; }
   .badge-amber  { background:#fef3c7; color:#995213; }
   .badge-gray   { background:#f3f4f6; color:#6b7280; }
-  .badge-blue   { background:#dbeafe; color:#0053e2; }
+  .badge-blue   { background:#d7f5f0; color:#0f766e; }
   .badge-purple { background:#ede9fe; color:#6d28d9; }
   .badge-ene  { background:#e0f2fe;color:#0369a1 }
   .badge-feb  { background:#f5f3ff;color:#7c3aed }
@@ -47,8 +48,18 @@
   .pill-group { display:flex; gap:.5rem; }
   .pill { cursor:pointer; padding:.35rem 1rem; border-radius:999px; font-size:.82rem; font-weight:600;
            border:2px solid #d1d5db; color:#374151; background:white; transition:all .15s; user-select:none; }
-  .pill:hover { border-color:#0053e2; color:#0053e2; }
-  .pill.active { background:#0053e2; color:white; border-color:#0053e2; }
+  .pill:hover { border-color:#00A651; color:#00A651; }
+  .pill.active { background:#00A651; color:white; border-color:#00A651; }
+  /* Combo box REC (Anio / Mes) */
+  .combo-rec { cursor:pointer; padding:.4rem 2rem .4rem .9rem; border-radius:.6rem; font-size:.82rem; font-weight:600;
+                border:2px solid #d1d5db; color:#374151; background:white; transition:all .15s; appearance:none;
+                -webkit-appearance:none; background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%236b7280"><path d="M5.25 7.5l4.75 5 4.75-5z"/></svg>');
+                background-repeat:no-repeat; background-position:right .6rem center; background-size:1rem; }
+  .combo-rec:hover, .combo-rec:focus { border-color:#00A651; color:#00A651; outline:none; }
+  .combo-rec { text-align:center; text-align-last:center; }
+  /* Titulos de filtros (Detalle por Proyecto) resaltados */
+  .filtro-titulo { color:#00A651; font-weight:800; }
+  .msel-label { text-align:center; }
   /* Plan Proximidad banner */
   .prox-banner  { display:flex; flex-wrap:wrap; gap:0; background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); margin-bottom:1.5rem; overflow:hidden; }
   .prox-item    { display:flex; align-items:flex-start; gap:.75rem; padding:1rem 1.5rem; flex:1; min-width:280px; }
@@ -56,17 +67,36 @@
   .prox-title   { font-size:.82rem; font-weight:700; color:#1A1A1A; margin-bottom:.25rem; }
   .prox-states  { font-size:.78rem; color:#555; line-height:1.6; }
   .prox-bps     { display:inline-block; background:#fef3c7; color:#995213; font-size:.72rem; font-weight:700; padding:.1rem .45rem; border-radius:999px; margin-left:.35rem; vertical-align:middle; }
-  .prox-mayor   { border-left:4px solid #0053E2; }
+  .prox-mayor   { border-left:4px solid #00A651; }
   .prox-menor   { border-left:4px solid #FFC220; }
   .prox-divider { width:1px; background:#e5e7eb; margin:.75rem 0; flex-shrink:0; }
+  /* Plan Proximidad banner unificado (desde Octubre 2026) */
+  .prox-banner-single { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08);
+                          margin-bottom:1.5rem; padding:1.1rem 1.5rem; text-align:center; border-left:4px solid #00A651; }
+  .prox-title-center  { font-size:.88rem; font-weight:700; color:#1A1A1A; margin-bottom:.4rem; }
+  .prox-states-center { font-size:.8rem; color:#555; line-height:1.6; }
+  /* Variantes compactas inline (viven junto a los combos Anio/Mes en la Barra 1) */
+  .prox-row-divider { width:1px; align-self:stretch; background:#e5e7eb; }
+  .prox-center-wrap { flex:1; display:flex; justify-content:center; flex-wrap:wrap; }
+  .prox-banner-inline { display:flex; flex-wrap:wrap; gap:0; align-items:center; justify-content:center; }
+  .prox-banner-inline .prox-item { display:flex; flex-direction:column; align-items:center; text-align:center;
+                                     padding:.15rem 1.15rem; min-width:0; flex:initial; gap:.15rem; }
+  .prox-banner-inline .prox-icon { font-size:1.1rem; margin:0; }
+  .prox-banner-inline .prox-title { font-size:.76rem; font-weight:800; color:#00A651; letter-spacing:.02em; margin-bottom:.1rem; }
+  .prox-banner-inline .prox-states { font-size:.8rem; color:#374151; font-weight:500; line-height:1.4; }
+  .prox-banner-inline .prox-divider { margin:0; }
+  .prox-banner-single-inline { text-align:center; padding:.15rem 1.15rem; }
+  .prox-banner-single-inline .prox-title-center { font-size:.8rem; font-weight:800; color:#00A651; letter-spacing:.03em;
+                                                    text-transform:uppercase; margin-bottom:.15rem; }
+  .prox-banner-single-inline .prox-states-center { font-size:.82rem; color:#374151; font-weight:500; line-height:1.5; }
   /* Multi-select dropdowns */
   .msel { position:relative; user-select:none; }
   .msel-trigger { display:flex; align-items:center; gap:.4rem; cursor:pointer; border:1px solid #d1d5db;
                    border-radius:.5rem; padding:.35rem .75rem; font-size:.8rem; background:white;
                    white-space:nowrap; min-width:150px; }
-  .msel-trigger:hover { border-color:#0053e2; }
+  .msel-trigger:hover { border-color:#00A651; }
   .msel-label { flex:1; color:#374151; font-weight:500; }
-  .msel-count { background:#0053e2; color:white; border-radius:999px; padding:.05rem .45rem;
+  .msel-count { background:#00A651; color:white; border-radius:999px; padding:.05rem .45rem;
                  font-size:.68rem; font-weight:700; display:none; margin-left:.2rem; }
   .msel-count.active { display:inline; }
   .msel-arrow { font-size:.65rem; color:#9ca3af; }
@@ -78,16 +108,16 @@
                         font-size:.78rem; outline:none; box-sizing:border-box; }
   .msel-options { overflow-y:auto; max-height:220px; }
   .msel-opt { display:flex; align-items:center; gap:.5rem; padding:.35rem .65rem; font-size:.78rem; color:#374151; }
-  .msel-opt:hover { background:#f0f4ff; cursor:pointer; }
+  .msel-opt:hover { background:#eafaf1; cursor:pointer; }
   .msel-opt.unavail { opacity:.3; }
-  .msel-opt input[type=checkbox] { accent-color:#0053e2; width:14px; height:14px; flex-shrink:0; cursor:pointer; }
+  .msel-opt input[type=checkbox] { accent-color:#00A651; width:14px; height:14px; flex-shrink:0; cursor:pointer; }
   .msel-opt label { cursor:pointer; flex:1; line-height:1.4; }
 </style>
 </head>
 <body class="p-6">
 
 <!-- Header -->
-<div style="background:#0053E2" class="text-white rounded-xl px-8 py-5 mb-4 flex items-center justify-between">
+<div style="background:#00A651; position:sticky; top:0; z-index:50;" class="text-white rounded-xl px-8 py-5 mb-4 flex items-center justify-between shadow-lg">
   <div>
     <div class="text-xs font-semibold tracking-widest opacity-70 mb-1">FINANZAS REAL ESTATE</div>
     <h1 class="text-2xl font-bold">Análisis Margen</h1>
@@ -98,47 +128,42 @@
   </div>
 </div>
 
-<!-- Barra 1: Selector de mes -->
+<!-- Barra 1: Estados Plan de Proximidad (Anio/Mes se movieron a Detalle por Proyecto) -->
 <div class="section mb-2 py-3 px-5">
-  <div class="flex items-center gap-4 flex-wrap">
-    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">REC</span>
-    <div class="pill-group">
-      <div class="pill active" id="pill-todos" onclick="selectTodos()">Todos</div>
-      <div class="pill" id="pill-enero-2026" onclick="toggleMes('Enero 2026')">Enero</div>
-      <div class="pill" id="pill-febrero-2026" onclick="toggleMes('Febrero 2026')">Febrero</div>
-      <div class="pill" id="pill-marzo-2026" onclick="toggleMes('Marzo 2026')">Marzo</div>
-      <div class="pill" id="pill-abril-2026" onclick="toggleMes('Abril 2026')">Abril</div>
-      <div class="pill" id="pill-mayo-2026" onclick="toggleMes('Mayo 2026')">Mayo</div>
-      <div class="pill" id="pill-junio-2026" onclick="toggleMes('Junio 2026')">Junio</div>
-      <div class="pill" id="pill-julio-2026" onclick="toggleMes('Julio 2026')">Julio</div>
-      <div class="pill" id="pill-agosto-2026" onclick="toggleMes('Agosto 2026')">Agosto</div>
-      <div class="pill" id="pill-septiembre-2026" onclick="toggleMes('Septiembre 2026')">Septiembre</div>
-      <div class="pill" id="pill-octubre-2026" onclick="toggleMes('Octubre 2026')">Octubre</div>
+  <div class="flex items-center justify-center flex-wrap">
+    <div class="prox-center-wrap">
+    <!-- Cintillo historico (Enero-Septiembre), version compacta inline -->
+    <div class="prox-banner-inline" id="prox-banner-old">
+      <div class="prox-item prox-mayor">
+        <span class="prox-icon">&#128205;</span>
+        <div>
+          <div class="prox-title">Plan de Proximidad Activo &gt;12 Meses</div>
+          <div class="prox-states">Ciudad de México &middot; Estado de México &middot; Guanajuato &middot; Puebla &middot; Veracruz</div>
+        </div>
+      </div>
+      <div class="prox-divider"></div>
+      <div class="prox-item prox-menor">
+        <span class="prox-icon">&#128204;</span>
+        <div>
+          <div class="prox-title">Plan de Proximidad Activo &lt;12 Meses <span class="prox-bps">−120 Bps</span></div>
+          <div class="prox-states">Aguascalientes &middot; Guerrero &middot; Hidalgo &middot; Jalisco &middot; Michoacán &middot; Querétaro &middot; Tlaxcala &middot; San Luis Potosí</div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- Barra 2: Detalle por mes -->
-<div class="section mb-4 py-2 px-5">
-  <div class="flex items-center gap-6 flex-wrap">
-    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Detalle</span>
-    <span class="text-xs text-gray-600" id="det-enero-2026"><span class="badge badge-ene">Enero</span> <span class="font-semibold ml-1">8 proy.</span> <span class="text-gray-400 ml-1">0 New &nbsp;&middot;&nbsp; 8 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-febrero-2026"><span class="badge badge-feb">Febrero</span> <span class="font-semibold ml-1">26 proy.</span> <span class="text-gray-400 ml-1">19 New &nbsp;&middot;&nbsp; 7 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-marzo-2026"><span class="badge badge-mar">Marzo</span> <span class="font-semibold ml-1">18 proy.</span> <span class="text-gray-400 ml-1">10 New &nbsp;&middot;&nbsp; 8 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-abril-2026"><span class="badge badge-abr">Abril</span> <span class="font-semibold ml-1">24 proy.</span> <span class="text-gray-400 ml-1">16 New &nbsp;&middot;&nbsp; 8 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-mayo-2026"><span class="badge badge-mayo">Mayo</span> <span class="font-semibold ml-1">19 proy.</span> <span class="text-gray-400 ml-1">12 New &nbsp;&middot;&nbsp; 7 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-junio-2026"><span class="badge badge-junio">Junio</span> <span class="font-semibold ml-1">50 proy.</span> <span class="text-gray-400 ml-1">36 New &nbsp;&middot;&nbsp; 14 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-julio-2026"><span class="badge badge-jul">Julio</span> <span class="font-semibold ml-1">19 proy.</span> <span class="text-gray-400 ml-1">14 New &nbsp;&middot;&nbsp; 5 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-agosto-2026"><span class="badge badge-ago">Agosto</span> <span class="font-semibold ml-1">18 proy.</span> <span class="text-gray-400 ml-1">12 New &nbsp;&middot;&nbsp; 6 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-septiembre-2026"><span class="badge badge-sep">Septiembre</span> <span class="font-semibold ml-1">28 proy.</span> <span class="text-gray-400 ml-1">22 New &nbsp;&middot;&nbsp; 6 REP</span></span>
-    <span class="text-xs text-gray-600" id="det-octubre-2026"><span class="badge badge-oct">Octubre</span> <span class="font-semibold ml-1">34 proy.</span> <span class="text-gray-400 ml-1">27 New &nbsp;&middot;&nbsp; 7 REP</span></span>
+    <!-- Cintillo unificado (Octubre en adelante), version compacta inline -->
+    <div class="prox-banner-single-inline" id="prox-banner-new" style="display:none">
+      <div class="prox-title-center">Estados Plan Proximidad Activo</div>
+      <div class="prox-states-center">Ciudad de México &middot; Estado de México &middot; Guanajuato &middot; Puebla &middot; Veracruz &middot; Aguascalientes &middot; Guerrero &middot; Hidalgo &middot; Jalisco &middot; Michoacán &middot; Querétaro &middot; Tlaxcala &middot; San Luis Potosí</div>
+    </div>
+    </div>
   </div>
 </div>
 
 <!-- KPI Cards -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
   <div class="kpi-card" style="border-left:4px solid #FFC220">
-    <div class="kpi-val text-blue-700" id="kpiTotal">244</div>
+    <div class="kpi-val text-green-700" id="kpiTotal">244</div>
     <div class="kpi-lbl">Total Proyectos</div>
     <div class="text-xs text-gray-400 mt-1" id="kpiTotalDetalle">Enero: 8 (0 New · 8 REP) · Febrero: 26 (19 New · 7 REP) · Marzo: 18 (10 New · 8 REP) · Abril: 24 (16 New · 8 REP) · Mayo: 19 (12 New · 7 REP) · Junio: 50 (36 New · 14 REP) · Julio: 19 (14 New · 5 REP) · Agosto: 18 (12 New · 6 REP) · Septiembre: 28 (22 New · 6 REP) · Octubre: 34 (27 New · 7 REP)</div>
   </div>
@@ -156,25 +181,6 @@
   </div>
 </div>
 
-<!-- ── Cintillo Plan Proximidad ── -->
-<div class="prox-banner">
-  <div class="prox-item prox-mayor">
-    <span class="prox-icon">📍</span>
-    <div>
-      <div class="prox-title">Plan de Proximidad Activo &gt;12 Meses</div>
-      <div class="prox-states">Ciudad de México &middot; Estado de México &middot; Guanajuato &middot; Puebla &middot; Veracruz</div>
-    </div>
-  </div>
-  <div class="prox-divider"></div>
-  <div class="prox-item prox-menor">
-    <span class="prox-icon">📌</span>
-    <div>
-      <div class="prox-title">Plan de Proximidad Activo &lt;12 Meses <span class="prox-bps">−120 Bps</span></div>
-      <div class="prox-states">Aguascalientes &middot; Guerrero &middot; Hidalgo &middot; Jalisco &middot; Michoacán &middot; Querétaro &middot; Tlaxcala &middot; San Luis Potosí</div>
-    </div>
-  </div>
-</div>
-
 <!-- Tabla -->
 <div class="section">
   <div class="section-title">📋 Detalle por Proyecto</div>
@@ -182,10 +188,29 @@
   <!-- Filtros -->
   <div class="flex flex-wrap gap-3 mb-4 items-end">
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Nombre</span>
+      <select id="selAnio" class="combo-rec" onchange="onAnioChange()">
+          <option value="2026">2026</option>
+      </select>
+    </div>
+    <div class="flex flex-col gap-1">
+      <select id="selMes" class="combo-rec" onchange="selectMesCombo()">
+          <option value="todos" selected>Mes</option>
+        <option value="Enero">Enero</option>
+        <option value="Febrero">Febrero</option>
+        <option value="Marzo">Marzo</option>
+        <option value="Abril">Abril</option>
+        <option value="Mayo">Mayo</option>
+        <option value="Junio">Junio</option>
+        <option value="Julio">Julio</option>
+        <option value="Agosto">Agosto</option>
+        <option value="Septiembre">Septiembre</option>
+        <option value="Octubre">Octubre</option>
+      </select>
+    </div>
+    <div class="flex flex-col gap-1">
       <div class="msel" id="dd-nombre">
         <div class="msel-trigger" onclick="toggleDD('dd-nombre')">
-          <span class="msel-label">Todos</span>
+          <span class="msel-label">Nombre: Todos</span>
           <span class="msel-count" id="dd-nombre-count"></span>
           <span class="msel-arrow">▾</span>
         </div>
@@ -196,10 +221,9 @@
       </div>
     </div>
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</span>
       <div class="msel" id="dd-estado">
         <div class="msel-trigger" onclick="toggleDD('dd-estado')">
-          <span class="msel-label">Todos</span>
+          <span class="msel-label">Estado: Todos</span>
           <span class="msel-count" id="dd-estado-count"></span>
           <span class="msel-arrow">▾</span>
         </div>
@@ -210,10 +234,9 @@
       </div>
     </div>
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo</span>
       <div class="msel" id="dd-tipo">
         <div class="msel-trigger" onclick="toggleDD('dd-tipo')">
-          <span class="msel-label">Todos</span>
+          <span class="msel-label">Tipo: Todos</span>
           <span class="msel-count" id="dd-tipo-count"></span>
           <span class="msel-arrow">▾</span>
         </div>
@@ -223,10 +246,9 @@
       </div>
     </div>
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Proto</span>
       <div class="msel" id="dd-proto">
         <div class="msel-trigger" onclick="toggleDD('dd-proto')">
-          <span class="msel-label">Todos</span>
+          <span class="msel-label">Proto: Todos</span>
           <span class="msel-count" id="dd-proto-count"></span>
           <span class="msel-arrow">▾</span>
         </div>
@@ -236,10 +258,9 @@
       </div>
     </div>
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Proximidad</span>
       <div class="msel" id="dd-proximidad">
         <div class="msel-trigger" onclick="toggleDD('dd-proximidad')">
-          <span class="msel-label">Todos</span>
+          <span class="msel-label">Proximidad: Todos</span>
           <span class="msel-count" id="dd-proximidad-count"></span>
           <span class="msel-arrow">▾</span>
         </div>
@@ -249,10 +270,9 @@
       </div>
     </div>
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Operador</span>
       <div class="msel" id="dd-operador">
         <div class="msel-trigger" onclick="toggleDD('dd-operador')">
-          <span class="msel-label">Todos</span>
+          <span class="msel-label">Operador: Todos</span>
           <span class="msel-count" id="dd-operador-count"></span>
           <span class="msel-arrow">▾</span>
         </div>
@@ -265,7 +285,7 @@
       class="px-4 py-1.5 rounded-lg text-sm font-semibold border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
       Limpiar filtros
     </button>
-    <span id="contadorFilas" class="text-xs text-gray-400 self-end pb-1.5"></span>
+    <span id="contadorFilas" class="text-xs text-gray-400 self-end pb-1.5" style="display:none"></span>
   </div>
 
   <div style="overflow-x:auto; max-height:560px; overflow-y:auto;">
@@ -4697,7 +4717,7 @@ const ALL_DATA = [
 ];
 
 // ── Estado de filtros ──────────────────────────────────────────────────────
-const MESES_INFO  = [{"mes": "Enero 2026", "nombre": "Enero", "total": 8, "new_c": 0, "rep_c": 8, "badge": "badge-ene", "emoji": "❄️", "sid": "enero-2026", "css": "background:#e0f2fe;color:#0369a1"}, {"mes": "Febrero 2026", "nombre": "Febrero", "total": 26, "new_c": 19, "rep_c": 7, "badge": "badge-feb", "emoji": "💜", "sid": "febrero-2026", "css": "background:#f5f3ff;color:#7c3aed"}, {"mes": "Marzo 2026", "nombre": "Marzo", "total": 18, "new_c": 10, "rep_c": 8, "badge": "badge-mar", "emoji": "🌿", "sid": "marzo-2026", "css": "background:#dcfce7;color:#166534"}, {"mes": "Abril 2026", "nombre": "Abril", "total": 24, "new_c": 16, "rep_c": 8, "badge": "badge-abr", "emoji": "🌸", "sid": "abril-2026", "css": "background:#fdf2f8;color:#db2777"}, {"mes": "Mayo 2026", "nombre": "Mayo", "total": 19, "new_c": 12, "rep_c": 7, "badge": "badge-mayo", "emoji": "🟣", "sid": "mayo-2026", "css": "background:#ede9fe;color:#6d28d9"}, {"mes": "Junio 2026", "nombre": "Junio", "total": 50, "new_c": 36, "rep_c": 14, "badge": "badge-junio", "emoji": "🔵", "sid": "junio-2026", "css": "background:#dbeafe;color:#0053e2"}, {"mes": "Julio 2026", "nombre": "Julio", "total": 19, "new_c": 14, "rep_c": 5, "badge": "badge-jul", "emoji": "🟠", "sid": "julio-2026", "css": "background:#ffedd5;color:#ea580c"}, {"mes": "Agosto 2026", "nombre": "Agosto", "total": 18, "new_c": 12, "rep_c": 6, "badge": "badge-ago", "emoji": "🔴", "sid": "agosto-2026", "css": "background:#fef2f2;color:#dc2626"}, {"mes": "Septiembre 2026", "nombre": "Septiembre", "total": 28, "new_c": 22, "rep_c": 6, "badge": "badge-sep", "emoji": "🟡", "sid": "septiembre-2026", "css": "background:#fffbeb;color:#d97706"}, {"mes": "Octubre 2026", "nombre": "Octubre", "total": 34, "new_c": 27, "rep_c": 7, "badge": "badge-oct", "emoji": "🟤", "sid": "octubre-2026", "css": "background:#fef3c7;color:#92400e"}];
+const MESES_INFO  = [{"mes": "Enero 2026", "nombre": "Enero", "total": 8, "new_c": 0, "rep_c": 8, "badge": "badge-ene", "emoji": "❄️", "sid": "enero-2026", "css": "background:#e0f2fe;color:#0369a1", "es_oct_en_adelante": false}, {"mes": "Febrero 2026", "nombre": "Febrero", "total": 26, "new_c": 19, "rep_c": 7, "badge": "badge-feb", "emoji": "💜", "sid": "febrero-2026", "css": "background:#f5f3ff;color:#7c3aed", "es_oct_en_adelante": false}, {"mes": "Marzo 2026", "nombre": "Marzo", "total": 18, "new_c": 10, "rep_c": 8, "badge": "badge-mar", "emoji": "🌿", "sid": "marzo-2026", "css": "background:#dcfce7;color:#166534", "es_oct_en_adelante": false}, {"mes": "Abril 2026", "nombre": "Abril", "total": 24, "new_c": 16, "rep_c": 8, "badge": "badge-abr", "emoji": "🌸", "sid": "abril-2026", "css": "background:#fdf2f8;color:#db2777", "es_oct_en_adelante": false}, {"mes": "Mayo 2026", "nombre": "Mayo", "total": 19, "new_c": 12, "rep_c": 7, "badge": "badge-mayo", "emoji": "🟣", "sid": "mayo-2026", "css": "background:#ede9fe;color:#6d28d9", "es_oct_en_adelante": false}, {"mes": "Junio 2026", "nombre": "Junio", "total": 50, "new_c": 36, "rep_c": 14, "badge": "badge-junio", "emoji": "🔵", "sid": "junio-2026", "css": "background:#dbeafe;color:#0053e2", "es_oct_en_adelante": false}, {"mes": "Julio 2026", "nombre": "Julio", "total": 19, "new_c": 14, "rep_c": 5, "badge": "badge-jul", "emoji": "🟠", "sid": "julio-2026", "css": "background:#ffedd5;color:#ea580c", "es_oct_en_adelante": false}, {"mes": "Agosto 2026", "nombre": "Agosto", "total": 18, "new_c": 12, "rep_c": 6, "badge": "badge-ago", "emoji": "🔴", "sid": "agosto-2026", "css": "background:#fef2f2;color:#dc2626", "es_oct_en_adelante": false}, {"mes": "Septiembre 2026", "nombre": "Septiembre", "total": 28, "new_c": 22, "rep_c": 6, "badge": "badge-sep", "emoji": "🟡", "sid": "septiembre-2026", "css": "background:#fffbeb;color:#d97706", "es_oct_en_adelante": false}, {"mes": "Octubre 2026", "nombre": "Octubre", "total": 34, "new_c": 27, "rep_c": 7, "badge": "badge-oct", "emoji": "🟤", "sid": "octubre-2026", "css": "background:#fef3c7;color:#92400e", "es_oct_en_adelante": true}];
 const ACTIVE_MESES = new Set();  // vacío = todos
 const SEL = { nombre: new Set(), estado: new Set(), tipo: new Set(), proto: new Set(), proximidad: new Set(), operador: new Set() };
 
@@ -4753,7 +4773,7 @@ function renderTable(data) {
       <td class="td-center">${mesBadge(r.mes)}</td>
       <td class="td-center">${tipoBadge(r.tipo)}</td>
       <td class="td-nombre">${r.nombre}</td>
-      <td class="td-long">${r.proto}</td>
+      <td class="td-proto">${r.proto}</td>
       <td>${r.estado}</td>
       <td>${r.ciudad}</td>
       <td class="td-num">${pctStr(r.margen_proto)}</td>
@@ -4891,10 +4911,8 @@ function actualizarKPIs(visibles) {
   const avgProto = cntProto ? sumProto/cntProto : null;
   const delta    = avgProy != null && avgProto != null ? avgProy - avgProto : null;
 
-  const mesLabel = ACTIVE_MESES.size === 0
-    ? MESES_INFO.map(m => m.mes).join(' · ')
-    : [...ACTIVE_MESES].join(' · ');
-  document.getElementById('kpiHeader').textContent = mesLabel + ' · ' + total + ' proyecto' + (total!==1?'s':'');
+  // Cintillo superior (header verde): fijo, no se liga a la seleccion de mes/Todos
+  document.getElementById('kpiHeader').textContent = '';
   document.getElementById('kpiTotal').textContent  = total;
   const detalle = `${cntNew} New · ${cntRep} REP`;
   document.getElementById('kpiTotalDetalle').textContent = detalle;
@@ -4948,29 +4966,55 @@ function filtrarTabla() {
 function mesDetalleSync() {
   const todos = ACTIVE_MESES.size === 0;
   MESES_INFO.forEach(m => {
-    const det  = document.getElementById('det-' + m.sid);
-    const pill = document.getElementById('pill-' + m.sid);
-    if (det)  det.style.display = (todos || ACTIVE_MESES.has(m.mes)) ? '' : 'none';
-    if (pill) pill.classList.toggle('active', ACTIVE_MESES.has(m.mes));
+    const det = document.getElementById('det-' + m.sid);
+    if (det) det.style.display = (todos || ACTIVE_MESES.has(m.mes)) ? '' : 'none';
   });
-  document.getElementById('pill-todos').classList.toggle('active', todos);
-  const label = todos
-    ? MESES_INFO.map(m => m.mes).join(' · ')
-    : [...ACTIVE_MESES].join(' · ');
-  document.getElementById('headerMesBadge').textContent = label;
+  // Cintillo superior (header verde): fijo, no se liga a la seleccion de mes/Todos
+  const badge = document.getElementById('headerMesBadge');
+  badge.textContent = '';
+  badge.style.display = 'none';
+
+  // ── Cintillo Plan Proximidad: nuevo (unificado) desde Octubre 2026 en adelante ──
+  const mostrarNuevo = todos
+    ? MESES_INFO.some(m => m.es_oct_en_adelante)
+    : [...ACTIVE_MESES].some(mes => {
+        const info = MESES_INFO.find(m => m.mes === mes);
+        return info && info.es_oct_en_adelante;
+      });
+  document.getElementById('prox-banner-new').style.display = mostrarNuevo ? '' : 'none';
+  document.getElementById('prox-banner-old').style.display = mostrarNuevo ? 'none' : '';
 }
 
-function selectTodos() {
+// ── Combo box REC: Anio / Mes ────────────────────────────────────────────────
+function populateMesSelect(anio, keepValue) {
+  const sel = document.getElementById('selMes');
+  const metas = MESES_INFO.filter(m => m.mes.endsWith(' ' + anio));
+  let opts = '<option value="todos">Mes</option>';
+  metas.forEach(m => { opts += `<option value="${m.nombre}">${m.nombre}</option>`; });
+  sel.innerHTML = opts;
+  if (keepValue && [...sel.options].some(o => o.value === keepValue)) sel.value = keepValue;
+  else sel.value = 'todos';
+}
+
+function onAnioChange() {
+  const anio = document.getElementById('selAnio').value;
+  populateMesSelect(anio);
+  selectMesCombo();
+}
+
+function selectMesCombo() {
+  const anio = document.getElementById('selAnio').value;
+  const mes  = document.getElementById('selMes').value;
   ACTIVE_MESES.clear();
+  if (mes !== 'todos') ACTIVE_MESES.add(mes + ' ' + anio);
   mesDetalleSync();
   rebuildMesDropdowns();
   filtrarTabla();
 }
 
-function toggleMes(mes) {
-  if (ACTIVE_MESES.has(mes)) { ACTIVE_MESES.delete(mes); }
-  else                       { ACTIVE_MESES.add(mes);    }
-  if (ACTIVE_MESES.size === 0) { selectTodos(); return; }
+function selectTodos() {
+  document.getElementById('selMes').value = 'todos';
+  ACTIVE_MESES.clear();
   mesDetalleSync();
   rebuildMesDropdowns();
   filtrarTabla();
@@ -4986,6 +5030,8 @@ function limpiarFiltros() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 renderTable(ALL_DATA);
+populateMesSelect(document.getElementById('selAnio').value);
+mesDetalleSync();
 </script>
 </body>
 </html>
